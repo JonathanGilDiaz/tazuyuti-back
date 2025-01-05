@@ -1,0 +1,29 @@
+/**
+ * @author Jonathan Gilberto Diaz Reyes
+ * @version 1.0.0 Creado el 05 Ene 2025
+ * @date 05/01/2025
+ */
+package com.example.residencia_back.configuration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public WebMvcConfigurer CORSConfigurer() {
+        return new WebMvcConfigurer() {
+            @SuppressWarnings("null")
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
+                        .allowedMethods("*")
+                        .allowedHeaders("*");
+            }
+        };
+    }
+}
