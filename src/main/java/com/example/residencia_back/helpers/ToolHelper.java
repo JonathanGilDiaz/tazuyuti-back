@@ -1,11 +1,10 @@
 /**
  * @author Jonathan Gilberto Diaz Reyes
- * @version 1.0.0 Creado el 04 Ene 2025
- * @date 04/01/2025
+ * @version 1.0.0 Creado el 23 Feb 2025
+ * @date 23/02/2025
  */
 package com.example.residencia_back.helpers;
 
-import com.example.residencia_back.models.administration.UserDetail;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -18,6 +17,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.example.residencia_back.models.administration.UserDetail;
+
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -26,13 +28,13 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 
 /**
- * A utility class for various helper methods related to tools and utilities in
- * the application.
- *
- * This class may contain static methods for common operations, data
- * transformations, or other utility functions that can be reused across
- * different parts of the application.
- */
+* A utility class for various helper methods related to tools and utilities in the application.
+*
+* This class may contain static methods for common operations, 
+* data transformations, or other utility functions that can be reused across 
+* different parts of the application.
+*/
+
 public class ToolHelper {
 
     private static final SimpleDateFormat DTF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -90,12 +92,12 @@ public class ToolHelper {
         String months[] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
         return months[month];
     }
-
     public static int getNumberMonthNow() {
         LocalDate currentdate = LocalDate.now();
         int month = currentdate.getMonthValue();
         return month;
     }
+    
 
     public static int getYearNow() {
         LocalDate currentdate = LocalDate.now();
@@ -104,11 +106,11 @@ public class ToolHelper {
 
     public static String getUserNameAuthenticate() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userName = "anonymousUser";
-        if (!auth.getPrincipal().getClass().getSimpleName().equals("String")) {
-            userName = ((UserDetail) auth.getPrincipal()).getUsername();
+		String userName = "anonymousUser";
+		if (!auth.getPrincipal().getClass().getSimpleName().equals("String")){
+			userName = ((UserDetail) auth.getPrincipal()).getUsername();
 
-        }
+		}
         return userName.trim();
     }
 
@@ -126,3 +128,4 @@ public class ToolHelper {
     }
 
 }
+

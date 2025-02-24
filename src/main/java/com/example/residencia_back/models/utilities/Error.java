@@ -1,7 +1,7 @@
 /**
- * @author Jonathan Gilberto Diaz Reyes
- * @version 1.0.0 Creado el 05 Ene 2025
- * @date 05/01/2025
+ * @author Dirección de Tecnologías e Innovación Digital - Secretaría de Finanzas
+ * @version 1.0.0 Creado el 19 Nov 2024
+ * @date 19/11/2024
  */
 package com.example.residencia_back.models.utilities;
 

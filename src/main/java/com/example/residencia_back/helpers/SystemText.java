@@ -1,13 +1,13 @@
 /**
  * @author Jonathan Gilberto Diaz Reyes
- * @version 1.0.0 Creado el 02 Ene 2025
- * @date 02/01/2025
+ * @version 1.0.0 Creado el 23 Feb 2025
+ * @date 23/02/2025
  */
 package com.example.residencia_back.helpers;
 
 public class SystemText {
-    
-        // Módulo: General
+
+    // Módulo: General
     public static class General {
 
         public static final String PROCESO_EXITOSO = "Proceso realizado exitosamente";
@@ -22,9 +22,14 @@ public class SystemText {
         public static final String REGISTRO_NO_ENCONTRADO = "Registro no encontrado";
         public static final String NO_HAY_REGISTROS = "No hay registros para mostrar";
         public static final String NO_ELIMINAR_REGISTRO_ASOCIADO = "No se puede eliminar el registro porque esta asociada a otra información.";
+        public static final String NO_GUARDADO_DOCUMENTO = "No se pudo gurdar el archivo.";
 
         public static final String CAMPO_INVALIDO_SORT(String texto) {
             return "La clave '" + texto + "' no es válida en 'sort'.";
+        }
+
+        public static final String DATO_INVALIDO_SORT(String texto1, String texto2) {
+            return "La dirección de ordenamiento '" + texto1 + "' para el campo '" + texto2 + "' no es válida.";
         }
 
         public static final String CAMPO_INVALIDO_FILTERS(String texto) {
@@ -47,9 +52,12 @@ public class SystemText {
         public static final String UTILITIES_CATALOGS_CATALOGOS = "Lista de nombre de los catalogos que se necesitan";
         public static final String UTILITIES_CATALOGS_CATALOGOS_VALORES_PERMITIDOS = "El catálogo debe ser uno de los valores permitidos";
         public static final String ACCESO_DENEGADO_CAMPO = "No se pudo acceder al campo ";
+        public static final String LIMITE_PERMITIDO_ARCHIVO = "El archivo supera el tamaño máximo permitido";
+        public static final String FORMATO_PERMITIDO_ARCHIVO = "El archivo no tiene un formato permitido";
+
     }
-    
-     // Módulo: Login
+
+    // Módulo: Login
     public static class Login {
 
         public static final String ENTITY_CORREO = "Usuario";
@@ -93,41 +101,58 @@ public class SystemText {
         public static final String CONSTRAINT_VIOLATION = "Violación de restricciones.";
         public static final String ERROR_PARAMETRO = "Error en el parametro: ";
         public static final String ERROR_LIMITE_MAXIMO_REQUEST_UPLOAD = "Se supero el tamaño máximo permitido por el servidor para una solicitud.";
-
     }
-    
-    // Módulo: Usuario
-    public static class User {
+
+     // Módulo: Usuario
+     public static class User {
 
         public static final String ENTITY_ID = "Identificador único del usuario";
         public static final String ENTITY_NOMBRE = "Nombre de la persona";
         public static final String ENTITY_APELLIDO_PATERNO = "Apellido paterno de la persona";
         public static final String ENTITY_APELLIDO_MATERNO = "Apellido materno de la persona";
+        public static final String ENTITY_CORREO_INSTITUCIONAL = "Correo institucional de la persona";
         public static final String ENTITY_CORREO_PERSONAL = "Correo personal de la persona";
         public static final String ENTITY_TELEFONO = "Teléfono de oficina de la persona";
+        public static final String ENTITY_EXTENSION = "Extensión de la oficina de la persona";
+        public static final String ENTITY_CELULAR = "Celular de la persona";
+        public static final String ENTITY_CARGO = "Cargo de la persona";
+        public static final String ENTITY_ROL = "Rol de la persona";
+        public static final String ENTITY_DEPENDENCIA = "Dependencia a la que pertenece la persona";
+        public static final String ENTITY_UNIDAD_EJECUTORA = "Unidad ejecutora a la que pertenece la persona";
+        public static final String ENTITY_AREA = "Area a la que pertenece la persona";
         public static final String ENTITY_ACTIVE = "Estatus del usuario";
-
+        public static final String CONTRASEÑA_VACIA = "La contraseña no puede estar vacía";
         public static final String ENTITY_USUARIO_ID_REQUERIDO = "El id del usuario es requerido.";
         public static final String ENTITY_USUARIO_NOMBRE_REQUERIDO = "El nombre es requerido.";
         public static final String ENTITY_USUARIO_APELLIDO_PATERNO_REQUERIDO = "El apellido paterno es requerido.";
         public static final String ENTITY_USUARIO_APELLIDO_MATERNO_REQUERIDO = "El apellido paterno es requerido.";
+        public static final String ENTITY_USUARIO_EMAIL_INSTITUCIONAL_REQUERIDO = "El correo institucional es requerido.";
+        public static final String ENTITY_USUARIO_TELEFONO_REQUERIDO = "El correo institucional es requerido.";
+        public static final String ENTITY_USUARIO_EMAIL_INSTITUCIONAL_INVALIDO = "El correo institucional no es válido.";
         public static final String ENTITY_USUARIO_EMAIL_PERSONAL_REQUERIDO = "El correo personal es requerido.";
         public static final String ENTITY_USUARIO_EMAIL_PERSONAL_INVALIDO = "El correo personal no es válido.";
-        public static final String ENTITY_USUARIO_TELEFONO_TAMANIO_TEXTO = "La longitud del teléfono no debe ser menor que 7 y mayor que 10 caracteres.";      
+        public static final String ENTITY_USUARIO_CARGO_REQUERIDO = "El cargo es requerido.";
+        public static final String ENTITY_USUARIO_EXTENSION_REQUERIDO = "La extensión es requerido.";
+        public static final String ENTITY_USUARIO_TELEFONO_TAMANIO_TEXTO = "La longitud del teléfono no debe ser menor que 7 y mayor que 10 caracteres.";
+        public static final String ENTITY_USUARIO_EXTENSION_TAMANIO_TEXTO = "La extensión no debe ser menor que 4 y mayor que 6 caracteres.";
+        public static final String ENTITY_USUARIO_CELULAR_REQUERIDO = "El celular es requerido.";
+        public static final String ENTITY_USUARIO_ROL_REQUERIDO = "El rol es requerido.";
         public static final String ENTITY_USUARIO_ACTIVO_REQUERIDO = "El estatus del usuario es requerido.";
 
         public static final String ENTITY_USUARIO_NOMBRE_TAMANIO_TEXTO = "El nombre no debe ser menor que 5 y mayor que 40 caracteres.";
         public static final String ENTITY_USUARIO_APELLIDO_TAMANIO_TEXTO = "El apellido no debe ser menor que 5 y mayor que 40 caracteres.";
+        public static final String ENTITY_USUARIO_CARGO_TAMANIO_TEXTO = "El cargo no debe ser menor que 5 y mayor que 50 caracteres.";
+        public static final String ENTITY_USUARIO_CELULAR_TAMANIO_TEXTO = "La longitud del celular no debe ser menor que 7 y mayor que 10 caracteres.";
 
         public static final String INFORMACION_INCORRECTA_ORDENAMIENTO = "Información incorrecta para el campo de ordenamiento";
         public static final String INFORMACION_INCORRECTA_BUSQUEDA = "Información incorrecta para el campo de búsqueda";
         public static final String EXISTE_CORREO_SISTEMA = "El correo ya se encuentra registrado en el sistema";
+        public static final String NO_REACTIVACION_EXISTE_CORREO_SISTEMA = "No se puede reactivar, porque su correo esta registrado con otro usuario";
         public static final String CREACION_USUARIO = "Alta de usuario";
         public static final String ACTUALIZACION_USUARIO = "Modificación de usuario";
         public static final String CREDENCIALES_ENVIADAS = "Las credenciales de acceso fueron enviadas al correo institucional";
         public static final String CREDENCIALES_NO_ENVIADAS = "Sin embargo las credenciales de acceso no pudieron ser envíadas al correo institucional";
         public static final String BAJA_USUARIO = "Baja de usuario";
-        public static final String ENTITY_USUARIO_TELEFONO_REQUERIDO = "El correo institucional es requerido.";
 
         public static final String USUARIO_ACTIVADO(String texto) {
             return "El usuario " + texto + " ha sido activado";
@@ -146,8 +171,7 @@ public class SystemText {
         public static final String MSJ_CORREO_CREACION_ACCESOS = "Se ha creado usuario de acceso al Sistema de Atención Ciudadana:";
         public static final String MSJ_CORREO_CONTRASENIA_NUEVA = "Contraseña nueva";
         public static final String MSJ_CORREO_CONTRASENIA = "Contraseña";
-        public static final String OPCIONES_VALIDAS_PAGINACION = "nombre,apellidoPaterno,apellidoMaterno,correo,telefono,activo";
+        public static final String OPCIONES_VALIDAS_PAGINACION = "nombre,apellidoPaterno,apellidoMaterno,correoInstitucional,correoPersonal,cargo,telefono,celular,rol.rol,dependencia.dependencia,unidadEjecutora.unidadEjecutora,activo,area.area";
 
     }
-
 }

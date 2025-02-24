@@ -1,7 +1,7 @@
 /**
  * @author Jonathan Gilberto Diaz Reyes
- * @version 1.0.0 Creado el 05 Ene 2025
- * @date 05/01/2025
+ * @version 1.0.0 Creado el 23 Feb 2025
+ * @date 23/02/2025
  */
 package com.example.residencia_back.configuration;
 
@@ -18,23 +18,22 @@ import org.springframework.http.HttpHeaders;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "SISTEMA MUNICIPIOS",
-                description = "Plataforma digital para el municipio",
+                title = "SISTEMA PARA MUNICIPIO DE ZIMATLAN DE ALVAREZ",
+                description = "Plataforma digital para la atención ciudadana",
                 version = "1.0",
                 termsOfService = "Terminos y servicios",
-                contact = @Contact(name = "Jonathan&Sabdiel", url = "www.pendiente.mx", email = "pendiente@gmail.com"),
-                license = @License(name = "Jonathan&Sabdiel", url = "www.pendiente.mx")
+                contact = @Contact(name = "Jonathan Gil & Sabdiel", url = "www.jonathan&sabdiel.mx/finanzas/", email = "jonathangildiaz211@gmail.com"),
+                license = @License(name = "Jonathan&Sabdiel", url = "www.jonathan&sabdiel.gob.mx")
         ),
         servers = {
             @Server(
                     description = "Local Environment",
                     url = "http://127.0.0.1:8080"
+            ),
+            @Server(
+                    description = "Developer Environment",
+                    url = "http://127.0.0.1:8080"
             )
-           /** @Server(
-                    description = "Quality Environment",
-                    url = "https://LINK_SERVIDOR"
-            ) */
-
         },
         security = @SecurityRequirement(
                 name = "Security Token"
