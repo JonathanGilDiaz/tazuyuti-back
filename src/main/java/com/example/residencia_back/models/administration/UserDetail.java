@@ -1,11 +1,10 @@
 /**
- * @author Dirección de Tecnologías e Innovación Digital - Secretaría de Finanzas
- * @version 1.0.0 Creado el 23 Oct 2024
- * @date 23/10/2024
+ * @author Jonathan Gilberto Diaz Reyes
+ * @version 1.0.0 Creado el 23 Feb 2025
+ * @date 23/02/2025
  */
 package com.example.residencia_back.models.administration;
 
-import com.example.residencia_back.entities.administration.User;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.example.residencia_back.entities.administration.User;
 
 /**
 * Implementation of Spring Security's UserDetails interface, representing the details of a user.
@@ -28,6 +28,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class UserDetail implements UserDetails {
 
     private final User usuario;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority((usuario.getRol().getId() == 1 ? "ADMINISTRADOR" : (usuario.getRol().getId() == 2 ? "COMBUSTIBLE" : "INVENTARIO"))));
+    }
 
     @Override
     public String getPassword() {
@@ -61,11 +66,6 @@ public class UserDetail implements UserDetails {
 
     public User getUsuario() {
         return usuario;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

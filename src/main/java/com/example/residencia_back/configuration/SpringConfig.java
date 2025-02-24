@@ -1,7 +1,7 @@
 /**
  * @author Jonathan Gilberto Diaz Reyes
- * @version 1.0.0 Creado el 05 Ene 2025
- * @date 05/01/2025
+ * @version 1.0.0 Creado el 23 Feb 2025
+ * @date 23/02/2025
  */
 package com.example.residencia_back.configuration;
 
@@ -20,6 +20,7 @@ import org.springframework.core.env.Environment;
 @ComponentScan({"com.example.residencia_back.*"})
 @PropertySources({
     @PropertySource("classpath:application.properties"),
+    @PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
 })
 public class SpringConfig {
     @Autowired
@@ -29,8 +30,8 @@ public class SpringConfig {
     @PostConstruct
     public void post() {
         logger.info("--------------------------------------------------------------------------------------------------");
-        logger.info("-------------------------  SISTEMA DE MUNICIPIO V.1.0  ---------------------------------");
-        logger.info("-------------------------------------  ENTORNO: DESARROLLO  -----------------------------------------");
+        logger.info("-------------------------   SISTEMA PARA MUNICIPIO ZIMATLAN DE ALVAREZ V.1.0  ---------------------------------");
+        logger.info("-------------------------------------  ENTORNO: " + environment.getProperty("deployMessage") + "  -----------------------------------------");
         logger.info("--------------------------------------------------------------------------------------------------");
     }
 

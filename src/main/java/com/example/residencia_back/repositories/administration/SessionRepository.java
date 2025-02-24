@@ -1,12 +1,10 @@
 /**
  * @author Jonathan Gilberto Diaz Reyes
- * @version 1.0.0 Creado el 05 Ene 2025
- * @date 05/01/2025
+ * @version 1.0.0 Creado el 23 Feb 2025
+ * @date 23/02/2025
  */
 package com.example.residencia_back.repositories.administration;
 
-import com.example.residencia_back.entities.administration.Session;
-import com.example.residencia_back.entities.administration.User;
 import jakarta.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.Optional;
@@ -15,6 +13,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.example.residencia_back.entities.administration.Session;
+import com.example.residencia_back.entities.administration.User;
 
 /**
 * Repository interface for managing Session entities.

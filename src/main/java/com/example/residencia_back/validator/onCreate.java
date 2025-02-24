@@ -1,7 +1,7 @@
 /**
  * @author Jonathan Gilberto Diaz Reyes
- * @version 1.0.0 Creado el 02 Ene 2025
- * @date 02/01/2025
+ * @version 1.0.0 Creado el 23 Feb 2025
+ * @date 23/02/2025
  */
 package com.example.residencia_back.validator;
 

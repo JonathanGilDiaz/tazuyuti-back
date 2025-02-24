@@ -1,7 +1,7 @@
 /**
  * @author Jonathan Gilberto Diaz Reyes
- * @version 1.0.0 Creado el 05 Ene 2025
- * @date 05/01/2025
+ * @version 1.0.0 Creado el 23 Feb 2025
+ * @date 23/02/2025
  */
 package com.example.residencia_back.configuration;
 
@@ -32,6 +32,7 @@ public class SecurityConfig {
         "/api/swagger-ui/**",
         "/api/v3/api-docs/**",
         "/webjars/**",
+        "/api/usuarios/save"
     };
 
     @Bean
@@ -41,6 +42,7 @@ public class SecurityConfig {
                 .disable())
                 .authorizeHttpRequests(authRequest -> authRequest
                 .requestMatchers(AUTH_WHITELIST).permitAll()
+                // .requestMatchers(HttpMethod.GET,"/api/usuarios/catalogs").hasAuthority("ADMINISTRADOR")
                 .anyRequest().authenticated())
                 .sessionManagement(sessionManager -> sessionManager
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
