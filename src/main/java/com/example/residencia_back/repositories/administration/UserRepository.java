@@ -38,4 +38,6 @@ public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecifi
         @Query("update User u set u.activo = ?1 where u.id = ?2")
         void setActivoForUsuario(boolean activo, int id);
 
+        public int countByUsuarioIgnoringCaseAndActivoTrueAndIdNot(String correo, int id);
+
 }

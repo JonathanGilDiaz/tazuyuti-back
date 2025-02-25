@@ -146,7 +146,7 @@ public class SystemText {
 
         public static final String INFORMACION_INCORRECTA_ORDENAMIENTO = "Información incorrecta para el campo de ordenamiento";
         public static final String INFORMACION_INCORRECTA_BUSQUEDA = "Información incorrecta para el campo de búsqueda";
-        public static final String EXISTE_CORREO_SISTEMA = "El correo ya se encuentra registrado en el sistema";
+        public static final String EXISTE_USUARIO_SISTEMA = "El usuario ya se encuentra registrado en el sistema";
         public static final String NO_REACTIVACION_EXISTE_CORREO_SISTEMA = "No se puede reactivar, porque su correo esta registrado con otro usuario";
         public static final String CREACION_USUARIO = "Alta de usuario";
         public static final String ACTUALIZACION_USUARIO = "Modificación de usuario";
@@ -171,7 +171,7 @@ public class SystemText {
         public static final String MSJ_CORREO_CREACION_ACCESOS = "Se ha creado usuario de acceso al Sistema de Atención Ciudadana:";
         public static final String MSJ_CORREO_CONTRASENIA_NUEVA = "Contraseña nueva";
         public static final String MSJ_CORREO_CONTRASENIA = "Contraseña";
-        public static final String OPCIONES_VALIDAS_PAGINACION = "nombre,apellidoPaterno,apellidoMaterno,correoInstitucional,correoPersonal,cargo,telefono,celular,rol.rol,dependencia.dependencia,unidadEjecutora.unidadEjecutora,activo,area.area";
+        public static final String OPCIONES_VALIDAS_PAGINACION = "usuario,nombre,apellidoPaterno,apellidoMaterno,correoPersonal,cargo,telefono,celular,rol.rol,activo";
 
     }
 }
