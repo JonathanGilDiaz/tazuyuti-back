@@ -20,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.example.residencia_back.models.administration.UserDetail;
 
-import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -114,17 +113,29 @@ public class ToolHelper {
         return userName.trim();
     }
 
-    public static String decrypt(String encryptedMessage, String privateKeyString) throws Exception {
-        byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyString.getBytes());
-        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA", "BC");
+    public static String decrypt(String encryptedData, String privateKeyPem) throws Exception {
+        try {
+            // Removemos los headers y espacios de la clave privada
+            privateKeyPem = privateKeyPem.replace("-----BEGIN PRIVATE KEY-----", "")
+                                         .replace("-----END PRIVATE KEY-----", "")
+                                         .replaceAll("\\s+", "");
 
-        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+            // Convertimos la clave de Base64 a bytes
+            byte[] keyBytes = Base64.getDecoder().decode(privateKeyPem);
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
 
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            // Configuramos el cifrado para desencriptar con RSA-OAEP
+            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-        return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedMessage)), StandardCharsets.UTF_8);
+            // Desencriptamos el mensaje (decodificamos de Base64 primero)
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
+            return new String(decryptedBytes, "UTF-8");
+        } catch (Exception e) {
+            throw new Exception("Error al desencriptar los datos: " + e.getMessage());
+        }
     }
 
 }

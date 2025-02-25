@@ -34,7 +34,7 @@ public class AuthCredentials {
     @Schema(description = SystemText.Login.ENTITY_CORREO)        // This annotation indicates that information for the swagger
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_CORREO_REQUERIDO)        // This annotation indicates that this parameter must not be null.
     @NotBlank(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_CORREO_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
-    private String correo;
+    private String usuario;
     
     @Schema(description = SystemText.Login.ENTITY_PASSWORD)        // This annotation indicates that information for the swagger
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_PASSWORD_REQUERIDO)        // This annotation indicates that this parameter must not be null.

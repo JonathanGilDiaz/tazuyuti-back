@@ -66,10 +66,12 @@ public class AuthController {
     @Value("${rsa.private_key_pem}")
     private String privateKeyPem;
 
+
     /**
     * Authenticates a user using the provided credentials.
     *
     * @param authCredentials Contains the user's email and password for authentication.
+    *                        - correo: Email to log in.
     *                        - password: Password to log in.
     * @return Response indicating whether authentication was successful, including a message and any relevant data.
     */
@@ -80,14 +82,7 @@ public class AuthController {
 				return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, SystemText.Login.VALIDACION_CAPTCHA_FALLO, null));
             }
 
-            try {
-                authCredentials.setCorreo(ToolHelper.decrypt(authCredentials.getCorreo(), privateKeyPem));
-                authCredentials.setPassword(ToolHelper.decrypt(authCredentials.getPassword(), privateKeyPem));
-            } catch (Exception e) {
-                authCredentials.setCorreo("");
-                authCredentials.setPassword("");
-            }
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authCredentials.getCorreo(), authCredentials.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authCredentials.getUsuario(), authCredentials.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             
             UserDetail usuarioDetail = (UserDetail) authentication.getPrincipal();
@@ -162,3 +157,4 @@ public class AuthController {
 		return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
     }
 }
+

@@ -6,6 +6,7 @@
 package com.example.residencia_back.services.administration;
 
 import com.example.residencia_back.entities.administration.User;
+import com.example.residencia_back.models.utilities.Pagination;
 import com.example.residencia_back.models.utilities.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -26,4 +27,12 @@ public interface UserService {
     
     void activeUser(boolean activo, int id);
     
+    ResponseEntity<Response> index(Pagination request);
+    
+    ResponseEntity<Response> catalogs();
+    
+    ResponseEntity<Response> detail(int id);
+
+    ResponseEntity<Response> update(User usuario, HttpServletRequest request);
+
 }    
