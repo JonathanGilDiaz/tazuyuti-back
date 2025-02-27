@@ -22,7 +22,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -71,7 +71,7 @@ public class LoadCard {
     @Column(name = "fecha_creacion", nullable = false)       // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
     private Timestamp fechaCreacion;
 
-    @OneToMany                 // This annotation indicates that Indicates that it is a foreign key
+    @ManyToOne                 // This annotation indicates that Indicates that it is a foreign key
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.LoadCard.ENTITY_USUARIO_ID_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     @Schema(description = SystemText.LoadCard.ENTITY_USUARIO_ID, example = "{\"id\": 1}")        // This annotation indicates that information for the swagger
     @JoinColumn(name = "usuario_id", nullable = false, referencedColumnName = "id")

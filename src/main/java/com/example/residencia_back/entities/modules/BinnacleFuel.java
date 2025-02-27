@@ -27,6 +27,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
@@ -67,25 +68,25 @@ public class BinnacleFuel {
     @Column(name = "fecha_carga", nullable = false)       // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
     private Timestamp fechaCarga;
 
-    @OneToMany                  // This annotation indicates that Indicates that it is a foreign key
+    @ManyToOne                  // This annotation indicates that Indicates that it is a foreign key
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.BinnacleFuel.ENTITY_FUNCIONARIO_ID_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     @Schema(description = SystemText.BinnacleFuel.ENTITY_FUNCIONARIO_ID, example = "{\"id\": 1}")        // This annotation indicates that information for the swagger
     @JoinColumn(name = "funcionario_id", nullable = false, referencedColumnName = "id")
     private Civil funcionario;
 
-    @OneToMany                  // This annotation indicates that Indicates that it is a foreign key
+    @ManyToOne                  // This annotation indicates that Indicates that it is a foreign key
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.BinnacleFuel.ENTITY_COMBUSTIBLE_ID_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     @Schema(description = SystemText.BinnacleFuel.ENTITY_COMBUSTIBLE_ID, example = "{\"id\": 1}")        // This annotation indicates that information for the swagger
     @JoinColumn(name = "combustible_id", nullable = false, referencedColumnName = "id")
     private Fuel combustible;
 
-    @OneToMany                 // This annotation indicates that Indicates that it is a foreign key
+    @ManyToOne                  // This annotation indicates that Indicates that it is a foreign key
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.BinnacleFuel.ENTITY_USUARIO_ID_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     @Schema(description = SystemText.BinnacleFuel.ENTITY_USUARIO_ID, example = "{\"id\": 1}")        // This annotation indicates that information for the swagger
     @JoinColumn(name = "usuario_id", nullable = false, referencedColumnName = "id")
     private User usuario;
 
-    @OneToMany                 // This annotation indicates that Indicates that it is a foreign key
+    @ManyToOne                  // This annotation indicates that Indicates that it is a foreign key
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.BinnacleFuel.ENTITY_VEHICULO_ID_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     @Schema(description = SystemText.BinnacleFuel.ENTITY_VEHICULO_ID, example = "{\"id\": 1}")        // This annotation indicates that information for the swagger
     @JoinColumn(name = "vehiculo_id", nullable = false, referencedColumnName = "id")
@@ -123,6 +124,6 @@ public class BinnacleFuel {
     @Builder.Default                    // This annotation indicates that the attribute has a default value
     @JsonManagedReference               
     @Schema(description = SystemText.BinnacleFuel.ENTITY_LISTA_DOCUMENTOS, example = "[{\"id\": 1, \"archivo\": \"File\"}, {\"id\": 2, \"archivo\": \"File\"}]")        // This annotation indicates that information for the swagger
-	@OneToMany(mappedBy = "seguimiento", fetch = FetchType.LAZY, orphanRemoval = false)
+	@OneToMany(mappedBy = "bitacoraCombustible", fetch = FetchType.LAZY, orphanRemoval = false)
 	private List<FilesBinnacleFuel> documentos = new ArrayList<>();
 }
