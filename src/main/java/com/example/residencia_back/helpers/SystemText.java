@@ -110,25 +110,19 @@ public class SystemText {
         public static final String ENTITY_NOMBRE = "Nombre de la persona";
         public static final String ENTITY_APELLIDO_PATERNO = "Apellido paterno de la persona";
         public static final String ENTITY_APELLIDO_MATERNO = "Apellido materno de la persona";
-        public static final String ENTITY_CORREO_INSTITUCIONAL = "Correo institucional de la persona";
         public static final String ENTITY_CORREO_PERSONAL = "Correo personal de la persona";
         public static final String ENTITY_TELEFONO = "Teléfono de oficina de la persona";
         public static final String ENTITY_EXTENSION = "Extensión de la oficina de la persona";
         public static final String ENTITY_CELULAR = "Celular de la persona";
         public static final String ENTITY_CARGO = "Cargo de la persona";
         public static final String ENTITY_ROL = "Rol de la persona";
-        public static final String ENTITY_DEPENDENCIA = "Dependencia a la que pertenece la persona";
-        public static final String ENTITY_UNIDAD_EJECUTORA = "Unidad ejecutora a la que pertenece la persona";
-        public static final String ENTITY_AREA = "Area a la que pertenece la persona";
         public static final String ENTITY_ACTIVE = "Estatus del usuario";
         public static final String CONTRASEÑA_VACIA = "La contraseña no puede estar vacía";
         public static final String ENTITY_USUARIO_ID_REQUERIDO = "El id del usuario es requerido.";
         public static final String ENTITY_USUARIO_NOMBRE_REQUERIDO = "El nombre es requerido.";
         public static final String ENTITY_USUARIO_APELLIDO_PATERNO_REQUERIDO = "El apellido paterno es requerido.";
         public static final String ENTITY_USUARIO_APELLIDO_MATERNO_REQUERIDO = "El apellido paterno es requerido.";
-        public static final String ENTITY_USUARIO_EMAIL_INSTITUCIONAL_REQUERIDO = "El correo institucional es requerido.";
         public static final String ENTITY_USUARIO_TELEFONO_REQUERIDO = "El correo institucional es requerido.";
-        public static final String ENTITY_USUARIO_EMAIL_INSTITUCIONAL_INVALIDO = "El correo institucional no es válido.";
         public static final String ENTITY_USUARIO_EMAIL_PERSONAL_REQUERIDO = "El correo personal es requerido.";
         public static final String ENTITY_USUARIO_EMAIL_PERSONAL_INVALIDO = "El correo personal no es válido.";
         public static final String ENTITY_USUARIO_CARGO_REQUERIDO = "El cargo es requerido.";
@@ -172,6 +166,118 @@ public class SystemText {
         public static final String MSJ_CORREO_CONTRASENIA_NUEVA = "Contraseña nueva";
         public static final String MSJ_CORREO_CONTRASENIA = "Contraseña";
         public static final String OPCIONES_VALIDAS_PAGINACION = "usuario,nombre,apellidoPaterno,apellidoMaterno,correoPersonal,cargo,telefono,celular,rol.rol,activo";
+    }
+
+    // Módulo: Civil
+    public static class Civil{
+        public static final String ENTITY_FUNCIONARIO_ID_REQUERIDO = "El id del funcionario es requerido.";
+        public static final String ENTITY_FUNCIONARIO_NOMBRE_REQUERIDO = "El nombre es requerido.";
+        public static final String ENTITY_FUNCIONARIO_NOMBRE_TAMANIO_TEXTO = "El nombre no debe ser menor que 2 y mayor que 30 caracteres.";
+        public static final String ENTITY_FUNCIONARIO_APELLIDO_TAMANIO_TEXTO = "El apellido no debe ser menor que 2 y mayor 30 40 caracteres.";
+        public static final String ENTITY_FUNCIONARIO_APELLIDO_PATERNO_REQUERIDO = "El apellido paterno es requerido.";
+        public static final String ENTITY_FUNCIONARIO_APELLIDO_MATERNO_REQUERIDO = "El apellido materno es requerido.";
+        public static final String ENTITY_ID = "Identificador único del funcionario";
+        public static final String ENTITY_NOMBRE = "Nombre de la persona";
+        public static final String ENTITY_APELLIDO_PATERNO = "Apellido paterno de la persona";
+        public static final String ENTITY_APELLIDO_MATERNO = "Apellido materno de la persona";
+        public static final String ENTITY_TELEFONO = "Teléfono de la persona";
+        public static final String ENTITY_FUNCIONARIO_TELEFONO_REQUERIDO = "El teléfono es requerido.";
+        public static final String ENTITY_FUNCIONARIO_TELEFONO_TAMANIO_TEXTO = "La longitud del teléfono no debe ser menor que 7 y mayor que 10 caracteres.";
 
     }
+
+    // Módulo: TruckType
+    public static class TruckType{
+        public static final String ENTITY_TIPO_CAMIONETA_ID_REQUERIDO = "El id del tipo de camioneta es requerido.";
+        public static final String ENTITY_TIPO_CAMIONETA_NOMBRE_REQUERIDO = "El nombre es requerido.";
+        public static final String ENTITY_TIPO_CAMIONETA_NOMBRE_TAMANIO_TEXTO = "El nombre no debe ser menor que 2 y mayor que 30 caracteres.";
+        public static final String ENTITY_TIPO_CAMIONETA_MODELO_TAMANIO_TEXTO = "El modelo no debe ser menor que 2 y mayor que 30 caracteres.";
+        public static final String ENTITY_ID = "Identificador único del tipo de camioneta";
+        public static final String ENTITY_NOMBRE = "Nombre del tipo de camioneta";
+        public static final String ENTITY_MODELO = "Modelo del tipo de camioneta";
+        public static final String ENTITY_TIPO_CAMIONETA_MODELO_REQUERIDO = "El nombre es requerido.";
+        public static final String ENTITY_COMBUSTIBLE_ID_REQUERIDO = "El combustible es requerido.";
+        public static final String ENTITY_COMBUSTIBLE_ID = "Combustible de la camioneta";    
+    
+    }
+
+    // Módulo: HistoryCard
+    public static class HistoryCard{
+        public static final String ENTITY_ID = "Identificador único del historial de la tarjeta";
+        public static final String ENTITY_ID_REQUERIDO = "Identificador único del historial de la tarjeta es requerido.";
+        public static final String ENTITY_ANTES = "Valor de la tarjeta antes de realizar la accion";
+        public static final String ENTITY_ANTES_REQUERIDO = "Valor de la tarjeta antes de realizar la accion es requerido.";
+        public static final String ENTITY_DESPUES = "Valor de la tarjeta despues de realizar la accion";
+        public static final String ENTITY_DESPUES_REQUERIDO = "Valor de la tarjeta despues de realizar la accion es requerido.";
+    }
+
+    public static class Car{
+        public static final String ENTITY_ID = "Identificador único del vehiculo";
+        public static final String ENTITY_VEHICULO_ID_REQUERIDO = "El id del vehiculo es requerido.";
+        public static final String ENTITY_VEHICULO_NOMBRE_REQUERIDO = "El nombre es requerido.";
+        public static final String ENTITY_VEHICULO_NOMBRE_TAMANIO_TEXTO = "El nombre no debe ser menor que 2 y mayor que 80 caracteres.";
+        public static final String ENTITY_VEHICULO_NUMERO_SERIE_REQUERIDO = "El numero de serie es requerido.";
+        public static final String ENTITY_VEHICULO_NUMERO_SERIE_TAMANIO_TEXTO = "El numero de serie no debe ser menor que 2 y mayor que 30 caracteres.";
+        public static final String ENTITY_VEHICULO_COLOR_REQUERIDO = "El color es requerido.";
+        public static final String ENTITY_VEHICULO_COLOR_TAMANIO_TEXTO = "El color no debe ser menor que 2 y mayor que 20 caracteres.";
+        public static final String ENTITY_VEHICULO_MARCA_REQUERIDO = "La marca es requerido.";
+        public static final String ENTITY_VEHICULO_MARCA_TAMANIO_TEXTO = "La marca no debe ser menor que 2 y mayor que 20 caracteres.";
+        public static final String ENTITY_VEHICULO_PLACAS_REQUERIDO = "La placa es requerido.";
+        public static final String ENTITY_VEHICULO_PLACAS_TAMANIO_TEXTO = "La placa no debe ser menor que 2 y mayor que 20 caracteres.";
+        public static final String ENTITY_VEHICULO_CDFI_REQUERIDO = "El CDFI es requerido.";
+        public static final String ENTITY_VEHICULO_CDFI_TAMANIO_TEXTO = "El CFDI no debe ser menor que 2 y mayor que 20 caracteres.";
+        public static final String ENTITY_NOMBRE = "Nombre del vehiculo";
+        public static final String ENTITY_VEHICULO_NUMERO_SERIE = "Numero de serie del vehiculo";
+        public static final String ENTITY_VEHICULO_COLOR = "Color del vehiculo";
+        public static final String ENTITY_VEHICULO_MARCA = "Marca del vehiculo";
+        public static final String ENTITY_VEHICULO_PLACAS = "Placas del vehiculo";
+        public static final String ENTITY_VEHICULO_CDFI = "CDFI del vehiculo";
+        public static final String ENTITY_VEHICULO_OBSERVACIONES = "Observaciones del vehiculo";
+        public static final String ENTITY_TIPO_CAMIONETA_ID_REQUERIDO = "El tipo de camioenta es requerido.";
+        public static final String ENTITY_TIPO_CAMIONETA_ID = "El tipo de vehiculo";    
+        public static final String ENTITY_AREA_ASIGNACION_ID_REQUERIDO = "El tipo de camioenta es requerido.";
+        public static final String ENTITY_AREA_ASIGNACION_ID = "El tipo de vehiculo";    
+    }
+
+    //Modulo cargar tarjeta
+    public static class LoadCard {
+        public static final String ENTITY_ID = "Identificador único del cargado de tarjeta";
+        public static final String ENTITY_ID_REQUERIDO = "Identificador único del cargado de tarjeta es requerido.";
+        public static final String ENTITY_USUARIO_ID_REQUERIDO = "El id del usuario es requerido.";
+        public static final String ENTITY_USUARIO_ID = "El id del usuario.";
+        public static final String ENTITY_OBSERVACIONES = "Observaciones de la carga";
+        public static final String ENTITY_CANTIDAD = "Cantidad a cargar a la tarjeta";
+        public static final String ENTITY_CANTIDAD_REQUERIDO = "Cantidad a cargar a la tarjeta es requerido.";
+    }
+
+    //Moduclo Bitacora de combustible
+    public static class BinnacleFuel{
+        public static final String ENTITY_ID = "Identificador único del cargado de combustible";
+        public static final String ENTITY_ID_REQUERIDO = "Identificador único del cargado de combustible es requerido.";
+        public static final String ENTITY_FUNCIONARIO_ID = "El funcionario que opera el vehiculo";    
+        public static final String ENTITY_FUNCIONARIO_ID_REQUERIDO = "El funcionario que opera el vehiculo es requerido.";
+        public static final String ENTITY_COMBUSTIBLE_ID = "El tipo de combustible";
+        public static final String ENTITY_COMBUSTIBLE_ID_REQUERIDO = "El tipo de combustible es requerido.";
+        public static final String ENTITY_USUARIO_ID = "El usuario que realiza la carga";
+        public static final String ENTITY_USUARIO_ID_REQUERIDO = "El usuario que realiza la carga es requerido.";
+        public static final String ENTITY_VEHICULO_ID = "El vehiculo que se le carga combustible";
+        public static final String ENTITY_VEHICULO_ID_REQUERIDO = "El vehiculo que se le carga combustible es requerido.";
+        public static final String ENTITY_CANTIDAD = "Cantidad de combustible";
+        public static final String ENTITY_CANTIDAD_REQUERIDO = "Cantidad de combustible es requerido.";
+        public static final String ENTITY_FECHA = "Fecha de la carga de combustible";
+        public static final String ENTITY_FECHA_REQUERIDO = "Fecha de la carga de combustible es requerido.";
+        public static final String ENTITY_OBSERVACIONES = "Observaciones de la carga de combustible";
+        public static final String ENTITY_KILOMETRAJE_INICIAL = "Kilometraje inicial del vehiculo";
+        public static final String ENTITY_KILOMETRAJE_INICIAL_REQUERIDO = "Kilometraje inicial del vehiculo es requerido.";
+        public static final String ENTITY_KILOMETRAJE_FINAL = "Kilometraje final del vehiculo";
+        public static final String ENTITY_KILOMETRAJE_FINAL_REQUERIDO = "Kilometraje final del vehiculo es requerido.";
+        public static final String ENTITY_GASTO = "Gasto del vehiculo";
+        public static final String ENTITY_GASTO_REQUERIDO = "Gasto del vehiculo es requerido.";
+        public static final String ENTITY_LITROS = "Listros gastados del vehiculo";
+        public static final String ENTITY_MOTIVO_RECORRIDO = "Motivo del recorrido";
+        public static final String ENTITY_LUGAR = "Lugar de la carga de combustible";
+        public static final String ENTITY_LUGAR_REQUERIDO = "Lugar de la carga de combustible es requerido.";
+        public static final String ENTITY_LISTA_DOCUMENTOS = "Lista de documentos de la carga de combustible";
+    }
+
 }
