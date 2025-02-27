@@ -19,7 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -101,13 +101,13 @@ public class Car {
     @Column(name = "cdfi_fecha", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
     private Timestamp cdfiFecha;
 
-    @OneToMany                  // This annotation indicates that Indicates that it is a foreign key
+    @ManyToOne                  // This annotation indicates that Indicates that it is a foreign key
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Car.ENTITY_TIPO_CAMIONETA_ID_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     @Schema(description = SystemText.Car.ENTITY_TIPO_CAMIONETA_ID, example = "{\"id\": 1}")        // This annotation indicates that information for the swagger
     @JoinColumn(name = "tipo_camioneta_id", nullable = false, referencedColumnName = "id")
     private TruckType camionetaTipo;
 
-    @OneToMany                  // This annotation indicates that Indicates that it is a foreign key
+    @ManyToOne                  // This annotation indicates that Indicates that it is a foreign key
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Car.ENTITY_AREA_ASIGNACION_ID_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     @Schema(description = SystemText.Car.ENTITY_AREA_ASIGNACION_ID, example = "{\"id\": 1}")        // This annotation indicates that information for the swagger
     @JoinColumn(name = "area_asignacion_id", nullable = false, referencedColumnName = "id")
