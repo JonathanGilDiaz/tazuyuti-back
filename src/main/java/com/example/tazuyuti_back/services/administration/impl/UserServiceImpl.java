@@ -16,6 +16,7 @@ import com.example.tazuyuti_back.models.utilities.Response;
 import com.example.tazuyuti_back.repositories.administration.SessionAttemptRepository;
 import com.example.tazuyuti_back.repositories.administration.UserRepository;
 import com.example.tazuyuti_back.repositories.catalogs.RoleRepository;
+import com.example.tazuyuti_back.repositories.catalogs.SucursalRepository;
 import com.example.tazuyuti_back.services.administration.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +48,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleRepository rolRepo;
+
+    @Autowired
+    private SucursalRepository sucursalRepo;
 
     @Override
     public ResponseEntity<Response> save(User usuario, HttpServletRequest request) {
@@ -123,6 +127,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<Response> catalogs() {
         Map<String, Object> response = new HashMap<>();
         response.put("roles", rolRepo.findByActivoTrue());
+        response.put("sucursales", sucursalRepo.findAll());
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.PROCESO_EXITOSO, response));
     }
 
@@ -150,7 +155,7 @@ public class UserServiceImpl implements UserService {
             User userToUpdate = user.get();
             Timestamp currentDate = ToolHelper.castDateTime(ToolHelper.getCurrentDateTime());
             userToUpdate.setNombre(usuario.getNombre());
-            userToUpdate.setUsuario(usuario.getUsuario());
+            userToUpdate.setUsuario(usuario.getNombre());
             userToUpdate.setRol(usuario.getRol());
             userToUpdate.setActivo(usuario.getActivo());
             userToUpdate.setSucursal(usuario.getSucursal());

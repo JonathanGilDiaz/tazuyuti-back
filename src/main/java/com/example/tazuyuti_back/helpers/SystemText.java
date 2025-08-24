@@ -145,7 +145,7 @@ public class SystemText {
         public static final String MSJ_CORREO_CREACION_ACCESOS = "Se ha creado usuario de acceso al Sistema de Atención Ciudadana:";
         public static final String MSJ_CORREO_CONTRASENIA_NUEVA = "Contraseña nueva";
         public static final String MSJ_CORREO_CONTRASENIA = "Contraseña";
-        public static final String OPCIONES_VALIDAS_PAGINACION = "usuario,nombre,apellidoPaterno,apellidoMaterno,correoPersonal,cargo,telefono,celular,rol.rol,activo";
+        public static final String OPCIONES_VALIDAS_PAGINACION = ",nombre,sucursal.nombre,rol.rol,activo,id";
     }
 
     // Módulo: Civil
