@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>residencia-back</artifactId>
+    <artifactId>tazuyuti-back</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
-    <name>residencia-back</name>
-    <description>Proyecto backend para residencia con Spring Boot y Jakarta EE 10</description>
+    <name>tazuyuti-back</name>
+    <description>Proyecto backend para tazuyuti con Spring Boot y Jakarta EE 10</description>
     <properties>
         <java.version>17</java.version>
         <log4j.version>1.2.17</log4j.version>

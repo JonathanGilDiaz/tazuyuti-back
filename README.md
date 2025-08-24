@@ -1,2 +1,2 @@
 # municipio-back
-Sistema para municipio con Spring
+Sistema para tazuyuti con Spring
