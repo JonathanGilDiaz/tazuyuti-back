@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
         }
         String encodedPassword = new BCryptPasswordEncoder().encode(plainPassword);
         usuario.setContrasenia(encodedPassword);
+        usuario.setUsuario(usuario.getNombre());
         usuario.setFecha_creacion(Timestamp.valueOf(LocalDateTime.now()));
         usuario = usuarioRepo.save(usuario);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -149,16 +150,10 @@ public class UserServiceImpl implements UserService {
             User userToUpdate = user.get();
             Timestamp currentDate = ToolHelper.castDateTime(ToolHelper.getCurrentDateTime());
             userToUpdate.setNombre(usuario.getNombre());
-            userToUpdate.setApellidoPaterno(usuario.getApellidoPaterno());
-            userToUpdate.setApellidoMaterno(usuario.getApellidoMaterno());
-            userToUpdate.setCargo(usuario.getCargo());
-            userToUpdate.setTelefono(usuario.getTelefono());
-            userToUpdate.setExtension(usuario.getExtension());
-            userToUpdate.setCelular(usuario.getCelular());
-            userToUpdate.setCorreoPersonal(usuario.getCorreoPersonal());
             userToUpdate.setUsuario(usuario.getUsuario());
             userToUpdate.setRol(usuario.getRol());
             userToUpdate.setActivo(usuario.getActivo());
+            userToUpdate.setSucursal(usuario.getSucursal());
             userToUpdate.setFecha_actualizacion(currentDate);
             if(!usuario.getContrasenia().equals("")){
                 String encodedPassword = new BCryptPasswordEncoder().encode(usuario.getContrasenia());

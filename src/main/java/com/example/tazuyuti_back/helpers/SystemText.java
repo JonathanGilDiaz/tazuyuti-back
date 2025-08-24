@@ -108,36 +108,16 @@ public class SystemText {
 
         public static final String ENTITY_ID = "Identificador único del usuario";
         public static final String ENTITY_NOMBRE = "Nombre de la persona";
-        public static final String ENTITY_APELLIDO_PATERNO = "Apellido paterno de la persona";
-        public static final String ENTITY_APELLIDO_MATERNO = "Apellido materno de la persona";
-        public static final String ENTITY_CORREO_PERSONAL = "Correo personal de la persona";
-        public static final String ENTITY_TELEFONO = "Teléfono de oficina de la persona";
-        public static final String ENTITY_EXTENSION = "Extensión de la oficina de la persona";
-        public static final String ENTITY_CELULAR = "Celular de la persona";
-        public static final String ENTITY_CARGO = "Cargo de la persona";
         public static final String ENTITY_ROL = "Rol de la persona";
         public static final String ENTITY_ACTIVE = "Estatus del usuario";
         public static final String CONTRASEÑA_VACIA = "La contraseña no puede estar vacía";
         public static final String ENTITY_USUARIO_ID_REQUERIDO = "El id del usuario es requerido.";
         public static final String ENTITY_USUARIO_NOMBRE_REQUERIDO = "El nombre es requerido.";
-        public static final String ENTITY_USUARIO_APELLIDO_PATERNO_REQUERIDO = "El apellido paterno es requerido.";
-        public static final String ENTITY_USUARIO_APELLIDO_MATERNO_REQUERIDO = "El apellido paterno es requerido.";
-        public static final String ENTITY_USUARIO_TELEFONO_REQUERIDO = "El correo institucional es requerido.";
-        public static final String ENTITY_USUARIO_EMAIL_PERSONAL_REQUERIDO = "El correo personal es requerido.";
-        public static final String ENTITY_USUARIO_EMAIL_PERSONAL_INVALIDO = "El correo personal no es válido.";
         public static final String ENTITY_USUARIO_CARGO_REQUERIDO = "El cargo es requerido.";
-        public static final String ENTITY_USUARIO_EXTENSION_REQUERIDO = "La extensión es requerido.";
-        public static final String ENTITY_USUARIO_TELEFONO_TAMANIO_TEXTO = "La longitud del teléfono no debe ser menor que 7 y mayor que 10 caracteres.";
-        public static final String ENTITY_USUARIO_EXTENSION_TAMANIO_TEXTO = "La extensión no debe ser menor que 4 y mayor que 6 caracteres.";
-        public static final String ENTITY_USUARIO_CELULAR_REQUERIDO = "El celular es requerido.";
         public static final String ENTITY_USUARIO_ROL_REQUERIDO = "El rol es requerido.";
+        public static final String ENTITY_SUCURSAL_ID_REQUERIDO = "El id de la sucursal es requerido";
+        public static final String ENTITY_SUCURSAL_ID = "El id de la sucursal";
         public static final String ENTITY_USUARIO_ACTIVO_REQUERIDO = "El estatus del usuario es requerido.";
-
-        public static final String ENTITY_USUARIO_NOMBRE_TAMANIO_TEXTO = "El nombre no debe ser menor que 5 y mayor que 40 caracteres.";
-        public static final String ENTITY_USUARIO_APELLIDO_TAMANIO_TEXTO = "El apellido no debe ser menor que 5 y mayor que 40 caracteres.";
-        public static final String ENTITY_USUARIO_CARGO_TAMANIO_TEXTO = "El cargo no debe ser menor que 5 y mayor que 50 caracteres.";
-        public static final String ENTITY_USUARIO_CELULAR_TAMANIO_TEXTO = "La longitud del celular no debe ser menor que 7 y mayor que 10 caracteres.";
-
         public static final String INFORMACION_INCORRECTA_ORDENAMIENTO = "Información incorrecta para el campo de ordenamiento";
         public static final String INFORMACION_INCORRECTA_BUSQUEDA = "Información incorrecta para el campo de búsqueda";
         public static final String EXISTE_USUARIO_SISTEMA = "El usuario ya se encuentra registrado en el sistema";

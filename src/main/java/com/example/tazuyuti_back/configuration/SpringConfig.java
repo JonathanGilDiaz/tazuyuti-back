@@ -17,7 +17,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@ComponentScan({"com.example.residencia_back.*"})
+@ComponentScan({"com.example.tazuyuti_back.*"})
 @PropertySources({
     @PropertySource("classpath:application.properties"),
     @PropertySource(value = "classpath:application-${spring.profiles.active}.properties", ignoreResourceNotFound = true)
@@ -30,7 +30,7 @@ public class SpringConfig {
     @PostConstruct
     public void post() {
         logger.info("--------------------------------------------------------------------------------------------------");
-        logger.info("-------------------------   SISTEMA PARA MUNICIPIO ZIMATLAN DE ALVAREZ V.1.0  ---------------------------------");
+        logger.info("-------------------------   SISTEMA PARA TAZUYUTI V.1.0  ---------------------------------");
         logger.info("-------------------------------------  ENTORNO: " + environment.getProperty("deployMessage") + "  -----------------------------------------");
         logger.info("--------------------------------------------------------------------------------------------------");
     }

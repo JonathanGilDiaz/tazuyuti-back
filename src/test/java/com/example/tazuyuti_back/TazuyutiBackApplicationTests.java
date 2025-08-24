@@ -1,10 +1,10 @@
-package com.example.residencia_back;
+package com.example.tazuyuti_back;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ResidenciaBackApplicationTests {
+class TazuyutiBackApplicationTests {
 
 	@Test
 	void contextLoads() {

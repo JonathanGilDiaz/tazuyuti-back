@@ -18,12 +18,12 @@ import org.springframework.http.HttpHeaders;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "SISTEMA PARA MUNICIPIO DE ZIMATLAN DE ALVAREZ",
-                description = "Plataforma digital para la atención ciudadana",
+                title = "SISTEMA PARA TAZUYUTI",
+                description = "Plataforma digital para transporte y paqueteria",
                 version = "1.0",
                 termsOfService = "Terminos y servicios",
-                contact = @Contact(name = "Jonathan Gil & Sabdiel", url = "www.jonathan&sabdiel.mx/finanzas/", email = "jonathangildiaz211@gmail.com"),
-                license = @License(name = "Jonathan&Sabdiel", url = "www.jonathan&sabdiel.gob.mx")
+                contact = @Contact(name = "Jonathan Gilberto Diaz Reyes", url = "", email = "jonathangildiaz211@gmail.com"),
+                license = @License(name = "JonathanGil", url = "www.JonathanGil.gob.mx")
         ),
         servers = {
             @Server(

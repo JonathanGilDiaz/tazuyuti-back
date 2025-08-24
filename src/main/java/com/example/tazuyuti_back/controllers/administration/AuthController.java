@@ -94,7 +94,7 @@ public class AuthController {
                     Timestamp endDate = new Timestamp(dateNow.getTime() + (SessionLifetime * 1_000));
                     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                     
-                    String claimName = usuario.getNombre() + " " + usuario.getApellidoPaterno() + " " + usuario.getApellidoMaterno();
+                    String claimName = usuario.getNombre();
                     String token = jwtService.getToken(userDetails, claimName);
                     //update sesion
                     sessionService.setUpdateActivo(false, usuario, dateNow);
@@ -123,8 +123,6 @@ public class AuthController {
                     usuarioMap.put("id", usuario.getId());
                     usuarioMap.put("usuario", usuario.getUsuario());
                     usuarioMap.put("nombre", usuario.getNombre());
-                    usuarioMap.put("apellidoPaterno", usuario.getApellidoPaterno());
-                    usuarioMap.put("apellidoMaterno", usuario.getApellidoMaterno());
                     usuarioMap.put("rol", usuario.getRol());
 
                     HashMap<String, Object> response = new HashMap<>();
