@@ -145,7 +145,7 @@ public class SystemText {
         public static final String MSJ_CORREO_CREACION_ACCESOS = "Se ha creado usuario de acceso al Sistema de Atención Ciudadana:";
         public static final String MSJ_CORREO_CONTRASENIA_NUEVA = "Contraseña nueva";
         public static final String MSJ_CORREO_CONTRASENIA = "Contraseña";
-        public static final String OPCIONES_VALIDAS_PAGINACION = ",nombre,sucursal.nombre,rol.rol,activo,id";
+        public static final String OPCIONES_VALIDAS_PAGINACION = "nombre,sucursal.nombre,rol.rol,activo,id";
     }
 
     // Módulo: Civil
@@ -258,6 +258,21 @@ public class SystemText {
         public static final String ENTITY_LUGAR = "Lugar de la carga de combustible";
         public static final String ENTITY_LUGAR_REQUERIDO = "Lugar de la carga de combustible es requerido.";
         public static final String ENTITY_LISTA_DOCUMENTOS = "Lista de documentos de la carga de combustible";
+    }
+
+    public static class Producto{
+        public static final String ENTITY_ID = "Identificador único del producto";
+        public static final String ENTITY_ID_REQUERIDO = "Identificador único del producto es requerido";
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,fechaActualizacion,estado,precio,costo,unidad,codigo,nombre";
+        public static final String PRODUCTO_REPETIDO = "Ya se cuenta con un producto con el mismo nombre o codigo";
+    }
+
+    public static class Cliente {
+            public static final String OPCIONES_VALIDAS_PAGINACION = "id,nombre,apellidoPaterno,apellidoMaterno,nombreComercial,rfc,sociedad,telefono,regimenFiscal,direccion,codigoPostal,tipoPersona,fechaActualizacion";
+    }
+
+    public static class Unidad{
+            public static final String OPCIONES_VALIDAS_PAGINACION = "id,nombre,encargado,placas,tipoCamioneta.nombre,tipoCamioneta.capacidad";
     }
 
 }
