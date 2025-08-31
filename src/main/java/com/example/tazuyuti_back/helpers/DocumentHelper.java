@@ -108,7 +108,7 @@ public class DocumentHelper {
             }
             document.close();
 response.put("archivo", Utils.encodeFileToBase64(archivoPdf));
-            // new File(archivoPdf).delete();
+             new File(archivoPdf).delete();
 
         } catch (Exception e) {
             e.printStackTrace();
