@@ -7,6 +7,7 @@ package com.example.tazuyuti_back.services.modules.impl;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,4 +123,15 @@ public class ProductoServiceImpl implements ProductoService {
         }
     }
 
+     @Override
+    public ResponseEntity<Response> getAll() {
+        List<Producto> productos = productoRepository.findByEstadoTrue();
+        if (!productos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new Response(true, SystemText.General.REGISTRO_ENCONTRADO, productos));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.REGISTRO_ENCONTRADO, null));
+        }
+    }
 }

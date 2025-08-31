@@ -10,39 +10,38 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.tazuyuti_back.entities.modules.Producto;
+import com.example.tazuyuti_back.entities.modules.Venta;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.Utils;
 import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
-import com.example.tazuyuti_back.services.modules.ProductoService;
+import com.example.tazuyuti_back.services.modules.VentaService;
 import com.example.tazuyuti_back.validator.onCreate;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api")
-public class ProductoController {
+public class VentaController {
 
     @Autowired
-    private ProductoService service;
+    private VentaService service;
 
-    @PostMapping(value = "/producto/save", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<Response> save(@Validated(onCreate.class) @ModelAttribute Producto producto,
+    @PostMapping(value = "/venta/save", consumes = { "application/json" })
+    public ResponseEntity<Response> save(
+            @Validated(onCreate.class) @RequestBody Venta venta,
             HttpServletRequest request) {
-        return service.save(producto, request);
+        return service.save(venta, request);
     }
-   
-    @PostMapping(value = "/producto/index", consumes = { "application/xml", "application/json" })
+
+    @PostMapping(value = "/venta/{idUsuario}/index", consumes = { "application/xml", "application/json" })
     public ResponseEntity<Response> index(
+            @PathVariable int idUsuario,
             @Validated @RequestBody Pagination request) {
         try {
             if (request.getPage() <= 0 || request.getSize() <= 0 || request.getSort().isEmpty()) {
@@ -51,10 +50,10 @@ public class ProductoController {
             }
 
             String message = Utils.validateFilteringInformation(
-                    SystemText.Producto.OPCIONES_VALIDAS_PAGINACION, request.getSort(),
+                    SystemText.Venta.OPCIONES_VALIDAS_PAGINACION, request.getSort(),
                     request.getFilters());
             if (message.equals("")) {
-                return service.index(request);
+                return service.index(idUsuario, request);
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, message, null));
             }
@@ -68,26 +67,13 @@ public class ProductoController {
         }
     }
 
-    @PostMapping(value = "/producto/update", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<Response> update(@Valid @ModelAttribute @Validated(onCreate.class) Producto producto,
-            HttpServletRequest request) {
-        return service.update(producto, request);
-    }
-
-    @PostMapping(value = "/producto/{id}/delete")
-    public ResponseEntity<Response> delete(@PathVariable(name = "id", required = true) int id,
-            HttpServletRequest request) {
-        return service.delete(id, request);
-    }
-
-   
-    @GetMapping(value = "/producto/{id}/detail")
+    @GetMapping(value = "/venta/{id}/detail")
     public ResponseEntity<Response> detail(@PathVariable(name = "id", required = true) int id) {
         return service.detail(id);
     }
 
-    @GetMapping(value = "/producto/getAll")
-    public ResponseEntity<Response> catalogs() {
-        return service.getAll();
+    @GetMapping(value = "/venta/{id}/ticket")
+    public ResponseEntity<Response> ticket(@PathVariable(name = "id", required = true) int id) {
+        return service.ticket(id);
     }
 }

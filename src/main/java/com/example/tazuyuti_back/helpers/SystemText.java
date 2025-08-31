@@ -275,4 +275,8 @@ public class SystemText {
             public static final String OPCIONES_VALIDAS_PAGINACION = "id,nombre,encargado,placas,tipoCamioneta.nombre,tipoCamioneta.capacidad";
     }
 
+    public static class Venta{
+      public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,estado,formaPago,total,folio,usuario.nombre";
+    }
+
 }

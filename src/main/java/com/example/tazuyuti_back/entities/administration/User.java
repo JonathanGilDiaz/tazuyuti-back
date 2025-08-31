@@ -18,6 +18,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -81,7 +82,7 @@ public class User {
 
     @Schema(description = SystemText.User.ENTITY_SUCURSAL_ID, example = "{ \"id\": 1 }")        // This annotation indicates that information for the swagger
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.User.ENTITY_SUCURSAL_ID_REQUERIDO)            // This annotation indicates that this parameter must not be null.
-    @OneToOne               // This annotation indicates that it has a one-to-one relationship with the assigned table.
+    @ManyToOne              // This annotation indicates that it has a one-to-one relationship with the assigned table.
     @JoinColumn(name = "sucursal_id", referencedColumnName = "id")                // This annotation indicates that Relate the table to another
     private Sucursal sucursal;
 

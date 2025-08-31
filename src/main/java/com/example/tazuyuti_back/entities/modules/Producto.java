@@ -85,6 +85,7 @@ public class Producto {
 
     @Column(name = "estado", nullable = false)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
     private boolean estado;
+    
     @CreationTimestamp
     @Schema(hidden = true)
     @Column(name = "fecha_creacion", nullable = false)
