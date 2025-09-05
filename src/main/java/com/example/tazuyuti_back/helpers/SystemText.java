@@ -72,6 +72,7 @@ public class SystemText {
         public static String INACTIVACION_CUENTA_USUARIO(String texto) {
             return "El usuario " + texto + " ha sido bloqueado tras varios intentos de inicio de sessión";
         }
+
         public static final String CREDENCIALES_INVALIDAS = "Datos de acceso incorrectos";
         public static final String CREDENCIALES_INVALIDAS_COMUNIQUESE_ADMINISTRADOR = "Datos de acceso incorrectos. Comuníquese con el administrador del sistema";
         public static final String INICIO_SESION = "Inicio de sesión";
@@ -93,6 +94,7 @@ public class SystemText {
         public static final String ARCHIVO_EXCEDE_PESO(String texto) {
             return "El archivo excede el peso máximo permitido: " + texto;
         }
+
         public static final String FALTA_INFORMACION_SOLICITUD = "Falta información en la solicitud.";
         public static final String INFORMACION_INCORRECTA_SOLICITUD = "Información incorrecta en la solicitud.";
         public static final String URL_NO_EXISTE = "La url solicitada no existe.";
@@ -103,8 +105,8 @@ public class SystemText {
         public static final String ERROR_LIMITE_MAXIMO_REQUEST_UPLOAD = "Se supero el tamaño máximo permitido por el servidor para una solicitud.";
     }
 
-     // Módulo: Usuario
-     public static class User {
+    // Módulo: Usuario
+    public static class User {
 
         public static final String ENTITY_ID = "Identificador único del usuario";
         public static final String ENTITY_NOMBRE = "Nombre de la persona";
@@ -149,7 +151,7 @@ public class SystemText {
     }
 
     // Módulo: Civil
-    public static class Civil{
+    public static class Civil {
         public static final String ENTITY_FUNCIONARIO_ID_REQUERIDO = "El id del funcionario es requerido.";
         public static final String ENTITY_FUNCIONARIO_NOMBRE_REQUERIDO = "El nombre es requerido.";
         public static final String ENTITY_FUNCIONARIO_NOMBRE_TAMANIO_TEXTO = "El nombre no debe ser menor que 2 y mayor que 30 caracteres.";
@@ -167,7 +169,7 @@ public class SystemText {
     }
 
     // Módulo: TruckType
-    public static class TruckType{
+    public static class TruckType {
         public static final String ENTITY_TIPO_CAMIONETA_ID_REQUERIDO = "El id del tipo de camioneta es requerido.";
         public static final String ENTITY_TIPO_CAMIONETA_NOMBRE_REQUERIDO = "El nombre es requerido.";
         public static final String ENTITY_TIPO_CAMIONETA_NOMBRE_TAMANIO_TEXTO = "El nombre no debe ser menor que 2 y mayor que 30 caracteres.";
@@ -177,12 +179,12 @@ public class SystemText {
         public static final String ENTITY_MODELO = "Modelo del tipo de camioneta";
         public static final String ENTITY_TIPO_CAMIONETA_MODELO_REQUERIDO = "El nombre es requerido.";
         public static final String ENTITY_COMBUSTIBLE_ID_REQUERIDO = "El combustible es requerido.";
-        public static final String ENTITY_COMBUSTIBLE_ID = "Combustible de la camioneta";    
-    
+        public static final String ENTITY_COMBUSTIBLE_ID = "Combustible de la camioneta";
+
     }
 
     // Módulo: HistoryCard
-    public static class HistoryCard{
+    public static class HistoryCard {
         public static final String ENTITY_ID = "Identificador único del historial de la tarjeta";
         public static final String ENTITY_ID_REQUERIDO = "Identificador único del historial de la tarjeta es requerido.";
         public static final String ENTITY_ANTES = "Valor de la tarjeta antes de realizar la accion";
@@ -191,7 +193,7 @@ public class SystemText {
         public static final String ENTITY_DESPUES_REQUERIDO = "Valor de la tarjeta despues de realizar la accion es requerido.";
     }
 
-    public static class Car{
+    public static class Car {
         public static final String ENTITY_ID = "Identificador único del vehiculo";
         public static final String ENTITY_VEHICULO_ID_REQUERIDO = "El id del vehiculo es requerido.";
         public static final String ENTITY_VEHICULO_NOMBRE_REQUERIDO = "El nombre es requerido.";
@@ -214,12 +216,12 @@ public class SystemText {
         public static final String ENTITY_VEHICULO_CDFI = "CDFI del vehiculo";
         public static final String ENTITY_VEHICULO_OBSERVACIONES = "Observaciones del vehiculo";
         public static final String ENTITY_TIPO_CAMIONETA_ID_REQUERIDO = "El tipo de camioenta es requerido.";
-        public static final String ENTITY_TIPO_CAMIONETA_ID = "El tipo de vehiculo";    
+        public static final String ENTITY_TIPO_CAMIONETA_ID = "El tipo de vehiculo";
         public static final String ENTITY_AREA_ASIGNACION_ID_REQUERIDO = "El tipo de camioenta es requerido.";
-        public static final String ENTITY_AREA_ASIGNACION_ID = "El tipo de vehiculo";    
+        public static final String ENTITY_AREA_ASIGNACION_ID = "El tipo de vehiculo";
     }
 
-    //Modulo cargar tarjeta
+    // Modulo cargar tarjeta
     public static class LoadCard {
         public static final String ENTITY_ID = "Identificador único del cargado de tarjeta";
         public static final String ENTITY_ID_REQUERIDO = "Identificador único del cargado de tarjeta es requerido.";
@@ -230,11 +232,11 @@ public class SystemText {
         public static final String ENTITY_CANTIDAD_REQUERIDO = "Cantidad a cargar a la tarjeta es requerido.";
     }
 
-    //Moduclo Bitacora de combustible
-    public static class BinnacleFuel{
+    // Moduclo Bitacora de combustible
+    public static class BinnacleFuel {
         public static final String ENTITY_ID = "Identificador único del cargado de combustible";
         public static final String ENTITY_ID_REQUERIDO = "Identificador único del cargado de combustible es requerido.";
-        public static final String ENTITY_FUNCIONARIO_ID = "El funcionario que opera el vehiculo";    
+        public static final String ENTITY_FUNCIONARIO_ID = "El funcionario que opera el vehiculo";
         public static final String ENTITY_FUNCIONARIO_ID_REQUERIDO = "El funcionario que opera el vehiculo es requerido.";
         public static final String ENTITY_COMBUSTIBLE_ID = "El tipo de combustible";
         public static final String ENTITY_COMBUSTIBLE_ID_REQUERIDO = "El tipo de combustible es requerido.";
@@ -260,7 +262,7 @@ public class SystemText {
         public static final String ENTITY_LISTA_DOCUMENTOS = "Lista de documentos de la carga de combustible";
     }
 
-    public static class Producto{
+    public static class Producto {
         public static final String ENTITY_ID = "Identificador único del producto";
         public static final String ENTITY_ID_REQUERIDO = "Identificador único del producto es requerido";
         public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,fechaActualizacion,estado,precio,costo,unidad,codigo,nombre";
@@ -268,15 +270,23 @@ public class SystemText {
     }
 
     public static class Cliente {
-            public static final String OPCIONES_VALIDAS_PAGINACION = "id,nombre,apellidoPaterno,apellidoMaterno,nombreComercial,rfc,sociedad,telefono,regimenFiscal,direccion,codigoPostal,tipoPersona,fechaActualizacion";
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,nombre,apellidoPaterno,apellidoMaterno,nombreComercial,rfc,sociedad,telefono,regimenFiscal,direccion,codigoPostal,tipoPersona,fechaActualizacion";
     }
 
-    public static class Unidad{
-            public static final String OPCIONES_VALIDAS_PAGINACION = "id,nombre,encargado,placas,tipoCamioneta.nombre,tipoCamioneta.capacidad";
+    public static class Precios {
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,nombre,descripcion,medidas,peso,precio";
     }
 
-    public static class Venta{
-      public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,estado,formaPago,total,folio,usuario.nombre";
+    public static class Unidad {
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,nombre,usuario.nombre,placas,tipoCamioneta.nombre,tipoCamioneta.capacidad";
+    }
+
+    public static class Venta {
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,estado,formaPago,total,folio,usuario.nombre";
+    }
+
+    public static class Paquete {
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,folio,fechaCreacion,usuario.nombre,usuario.sucursal.nombre,remitente,destino.nombre,destinatario,total,estado.nombre";
     }
 
 }

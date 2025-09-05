@@ -5,7 +5,6 @@
  */
 package com.example.tazuyuti_back.services.modules.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,54 +14,40 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.example.tazuyuti_back.entities.modules.Unidad;
+import com.example.tazuyuti_back.entities.modules.PrecioEquipaje;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.Utils;
 import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
-import com.example.tazuyuti_back.repositories.administration.UserRepository;
-import com.example.tazuyuti_back.repositories.catalogs.TipoCamionetaRepository;
-import com.example.tazuyuti_back.repositories.modules.UnidadRepository;
-import com.example.tazuyuti_back.services.modules.UnidadesService;
+import com.example.tazuyuti_back.repositories.modules.PrecioEquipajeRepository;
+import com.example.tazuyuti_back.services.modules.PrecioEquipajeService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 @Service
-public class UnidadServiceImpl implements UnidadesService {
+public class PrecioEquipajeServiceImpl  implements PrecioEquipajeService {
 
     @Autowired
-    private UnidadRepository repository;
-
-    @Autowired
-    private TipoCamionetaRepository tipoCamionetaRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Override @Transactional public ResponseEntity<Response> save(Unidad unidad, HttpServletRequest request) {
-        unidad.setEstado(true);
-        repository.save(unidad);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
-    }
+    private PrecioEquipajeRepository repository;
 
     @Override
-    public ResponseEntity<Response> catalogs() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("tipo", tipoCamionetaRepository.findAll());
-        response.put("usuarios", userRepository.findByRolIdAndActivoTrue(5));
+    @Transactional
+    public ResponseEntity<Response> save(PrecioEquipaje precioEquipaje, HttpServletRequest request) {
+        precioEquipaje.setEstado(true);
+        repository.save(precioEquipaje);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, response));
+                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public ResponseEntity<Response> index(Pagination requestT) {
-        Map<String, Object> data = Utils.getSpecificationAndPageable(requestT, Unidad.class);
-        Specification<Unidad> specs = (Specification<Unidad>) data.get("specification");
-        Specification<Unidad> estadoTrue = (root, query, cb) -> cb.isTrue(root.get("estado"));
-        Specification<Unidad> finalSpec = specs.and(estadoTrue);
-        Page<Unidad> list = repository.findAll(finalSpec, (Pageable) data.get("pageable"));
+        Map<String, Object> data = Utils.getSpecificationAndPageable(requestT, PrecioEquipaje.class);
+        Specification<PrecioEquipaje> specs = (Specification<PrecioEquipaje>) data.get("specification");
+        Specification<PrecioEquipaje> estadoTrue = (root, query, cb) -> cb.isTrue(root.get("estado"));
+        Specification<PrecioEquipaje> finalSpec = specs.and(estadoTrue);
+        Page<PrecioEquipaje> list = repository.findAll(finalSpec, (Pageable) data.get("pageable"));
         if (list.hasContent()) {
             return ResponseEntity.ok(new Response(true, SystemText.General.PROCESO_EXITOSO, list));
         } else {
@@ -73,14 +58,14 @@ public class UnidadServiceImpl implements UnidadesService {
 
     @Override
     @Transactional
-    public ResponseEntity<Response> update(Unidad unidad, HttpServletRequest request) {
-        Optional<Unidad> itemOp = repository.findById(unidad.getId());
+    public ResponseEntity<Response> update(PrecioEquipaje precioEquipaje, HttpServletRequest request) {
+        Optional<PrecioEquipaje> itemOp = repository.findById(precioEquipaje.getId());
         if (!itemOp.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
         }
-        unidad.setEstado(true);
-        repository.save(unidad);
+        precioEquipaje.setEstado(true);
+        repository.save(precioEquipaje);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
     }
@@ -89,17 +74,17 @@ public class UnidadServiceImpl implements UnidadesService {
     @Transactional
     public ResponseEntity<Response> delete(int id, HttpServletRequest request) {
         try {
-            Optional<Unidad> itemOp = repository.findById(id);
-            if (!itemOp.isPresent()) {
+            Optional<PrecioEquipaje> itemId = repository.findById(id);
+            if (!itemId.isPresent()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
             }
             try {
                 repository.deleteById(id);
             } catch (Exception e) {
-                Unidad item = itemOp.get();
-                item.setEstado(false);
-                repository.save(item);
+                PrecioEquipaje precioEquipaje = itemId.get();
+                precioEquipaje.setEstado(false);
+                repository.save(precioEquipaje);
             }
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new Response(true, SystemText.General.REGISTRO_ELIMINADO_CORRECTAMENTE, null));
@@ -112,7 +97,7 @@ public class UnidadServiceImpl implements UnidadesService {
 
     @Override
     public ResponseEntity<Response> detail(int id) {
-        Optional<Unidad> item = repository.findById(id);
+        Optional<PrecioEquipaje> item = repository.findById(id);
         if (item.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new Response(true, SystemText.General.REGISTRO_ENCONTRADO, item.get()));

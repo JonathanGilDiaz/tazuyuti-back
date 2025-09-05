@@ -124,6 +124,7 @@ public class AuthController {
                     usuarioMap.put("usuario", usuario.getUsuario());
                     usuarioMap.put("nombre", usuario.getNombre());
                     usuarioMap.put("rol", usuario.getRol());
+                    usuarioMap.put("sucursal", usuario.getSucursal());
 
                     HashMap<String, Object> response = new HashMap<>();
                     response.put("token", token);

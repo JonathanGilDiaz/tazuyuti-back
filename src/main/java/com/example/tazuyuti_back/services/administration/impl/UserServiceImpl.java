@@ -8,6 +8,7 @@ package com.example.tazuyuti_back.services.administration.impl;
 import org.springframework.stereotype.Service;
 
 import com.example.tazuyuti_back.entities.administration.User;
+import com.example.tazuyuti_back.entities.modules.Unidad;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.ToolHelper;
 import com.example.tazuyuti_back.helpers.Utils;
@@ -17,12 +18,14 @@ import com.example.tazuyuti_back.repositories.administration.SessionAttemptRepos
 import com.example.tazuyuti_back.repositories.administration.UserRepository;
 import com.example.tazuyuti_back.repositories.catalogs.RoleRepository;
 import com.example.tazuyuti_back.repositories.catalogs.SucursalRepository;
+import com.example.tazuyuti_back.repositories.modules.UnidadRepository;
 import com.example.tazuyuti_back.services.administration.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.sql.Timestamp;
@@ -52,6 +55,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private SucursalRepository sucursalRepo;
 
+    @Autowired
+    private UnidadRepository unidadRepository;
+
     @Override
     public ResponseEntity<Response> save(User usuario, HttpServletRequest request) {
         String plainPassword = usuario.getContrasenia();
@@ -67,7 +73,6 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new Response(true, SystemText.General.REGISTRO_CREADO_CORRECTAMENTE, null));
     }
-    
 
     @Override
     public ResponseEntity<Response> active(User usuario, HttpServletRequest request) {
@@ -76,19 +81,23 @@ public class UserServiceImpl implements UserService {
             if (user.isPresent()) {
                 usuarioRepo.setActivoForUsuario(usuario.getActivo(), usuario.getId());
                 if (usuario.getActivo()) {
-                    String dateNow = ToolHelper.getYearNow() + "-" + ToolHelper.getNumberMonthNow() + "-" + ToolHelper.getDayNow();
+                    String dateNow = ToolHelper.getYearNow() + "-" + ToolHelper.getNumberMonthNow() + "-"
+                            + ToolHelper.getDayNow();
                     Timestamp startDate = ToolHelper.castDateTime(dateNow + " 00:00:00");
                     Timestamp endDate = ToolHelper.castDateTime(dateNow + " 23:59:59");
                     intentoSessionRepo.deleteByUsuarioAndFechaBetween(usuario, startDate, endDate);
                 }
-                return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
             }
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, SystemText.General.ERROR_PROCESO, null));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new Response(false, SystemText.General.ERROR_PROCESO, null));
         }
-    }    
+    }
 
     @Override
     public Optional<User> findByUsuario(String usuario) {
@@ -110,16 +119,20 @@ public class UserServiceImpl implements UserService {
         usuarioRepo.setActivoForUsuario(activo, id);
     }
 
-    @SuppressWarnings({ "unchecked"})
+    @SuppressWarnings({ "unchecked" })
     @Override
     public ResponseEntity<Response> index(Pagination request) {
-        Pagination requestT = new Pagination(request.getPage(), request.getSize(), request.getSort(), request.getFilters());
+        Pagination requestT = new Pagination(request.getPage(), request.getSize(), request.getSort(),
+                request.getFilters());
         Map<String, Object> data = Utils.getSpecificationAndPageable(requestT, User.class);
-        Page<User> list = usuarioRepo.findAll((Specification<User>) data.get("specification"), (Pageable)data.get("pageable"));
-        if (list.getContent().size() > 0){
-            return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.PROCESO_EXITOSO, list));
+        Page<User> list = usuarioRepo.findAll((Specification<User>) data.get("specification"),
+                (Pageable) data.get("pageable"));
+        if (list.getContent().size() > 0) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new Response(true, SystemText.General.PROCESO_EXITOSO, list));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(false, SystemText.General.PROCESO_EXITOSO, null));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.PROCESO_EXITOSO, null));
         }
     }
 
@@ -128,31 +141,41 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> response = new HashMap<>();
         response.put("roles", rolRepo.findByActivoTrue());
         response.put("sucursales", sucursalRepo.findAll());
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.PROCESO_EXITOSO, response));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, response));
     }
 
     @Override
     public ResponseEntity<Response> detail(int id) {
         Optional<User> usuario = usuarioRepo.findById(id);
-        if (usuario.isPresent()){
+        if (usuario.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK)
-                .body(new Response(true, SystemText.General.REGISTRO_ENCONTRADO, usuario.get()));
+                    .body(new Response(true, SystemText.General.REGISTRO_ENCONTRADO, usuario.get()));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(false, SystemText.General.REGISTRO_ENCONTRADO, null));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.REGISTRO_ENCONTRADO, null));
         }
 
     }
 
     @Override
     public ResponseEntity<Response> update(User usuario, HttpServletRequest request) {
-        int counterMails = usuarioRepo.countByUsuarioIgnoringCaseAndActivoTrueAndIdNot(usuario.getUsuario(), usuario.getId());
+        int counterMails = usuarioRepo.countByUsuarioIgnoringCaseAndActivoTrueAndIdNot(usuario.getUsuario(),
+                usuario.getId());
         if (counterMails > 0) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, SystemText.User.EXISTE_USUARIO_SISTEMA, null));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new Response(false, SystemText.User.EXISTE_USUARIO_SISTEMA, null));
         }
-
         Optional<User> user = usuarioRepo.findById(usuario.getId());
         if (user.isPresent()) {
             User userToUpdate = user.get();
+            if (userToUpdate.getRol().getId() == 5 && usuario.getRol().getId() != 5) {
+                List<Unidad> unidadOp = unidadRepository.findByUsuarioId(userToUpdate.getId());
+                if(!unidadOp.isEmpty()){
+                       return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new Response(false, "No es posible modificar el rol del chofer, aun pertenece a una unidad", null));
+                }
+            }
             Timestamp currentDate = ToolHelper.castDateTime(ToolHelper.getCurrentDateTime());
             userToUpdate.setNombre(usuario.getNombre());
             userToUpdate.setUsuario(usuario.getNombre());
@@ -160,14 +183,16 @@ public class UserServiceImpl implements UserService {
             userToUpdate.setActivo(usuario.getActivo());
             userToUpdate.setSucursal(usuario.getSucursal());
             userToUpdate.setFecha_actualizacion(currentDate);
-            if(!usuario.getContrasenia().equals("")){
+            if (!usuario.getContrasenia().equals("")) {
                 String encodedPassword = new BCryptPasswordEncoder().encode(usuario.getContrasenia());
                 userToUpdate.setContrasenia(encodedPassword);
             }
             usuario = usuarioRepo.save(userToUpdate);
-            return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.REGISTRO_ACTUALIZADO_CORRECTAMENTE, null));
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new Response(true, SystemText.General.REGISTRO_ACTUALIZADO_CORRECTAMENTE, null));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(false, SystemText.User.EXISTE_USUARIO_SISTEMA, null));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.User.EXISTE_USUARIO_SISTEMA, null));
         }
     }
 }

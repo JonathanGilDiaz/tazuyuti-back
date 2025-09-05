@@ -5,6 +5,7 @@
  */
 package com.example.tazuyuti_back.repositories.administration;
 
+import java.util.List;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
@@ -40,5 +41,7 @@ public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecifi
         void setActivoForUsuario(boolean activo, int id);
 
         public int countByUsuarioIgnoringCaseAndActivoTrueAndIdNot(String correo, int id);
+
+        List<User> findByRolIdAndActivoTrue(int rolId);
 
 }
