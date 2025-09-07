@@ -108,4 +108,14 @@ public class PaqueteController {
             HttpServletRequest request) {
         return service.entregar(paquete);
     }
+
+        @GetMapping(value = "/paquete/{id}/ticketCliente")
+    public ResponseEntity<Response> ticketCliente(@PathVariable(name = "id", required = true) int id) {
+        return service.ticketCliente(id);
+    }
+
+        @GetMapping(value = "/paquete/{id}/ticketInterno")
+    public ResponseEntity<Response> ticketInterno(@PathVariable(name = "id", required = true) int id) {
+        return service.ticketInterno(id);
+    }
 }

@@ -6,14 +6,14 @@
 package com.example.tazuyuti_back.entities.modules;
 
 import java.sql.Timestamp;
-
 import org.hibernate.annotations.CreationTimestamp;
-
 import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.validator.onCreate;
 import com.example.tazuyuti_back.validator.onUpdate;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,10 +56,10 @@ public class EnviarPaquete {
     @CreationTimestamp
     @Schema(hidden = true)
     @Column(name = "fecha   ", nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Timestamp fecha;
 
     @OneToOne
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }")        // This annotation indicates that information for the swagger
     @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El Usuario es requerido")            // This annotation indicates that this parameter must not be null.
     @JoinColumn(name = "paquete_id", referencedColumnName = "id")                // This annotation indicates that Relate the table to another
@@ -71,9 +71,9 @@ public class EnviarPaquete {
     @JoinColumn(name = "unidad_id", referencedColumnName = "id")                // This annotation indicates that Relate the table to another
     private Unidad unidad;
 
-        @ManyToOne
-    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }")        // This annotation indicates that information for the swagger
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El ruta es requerido")            // This annotation indicates that this parameter must not be null.
-    @JoinColumn(name = "ruta_id", referencedColumnName = "id")                // This annotation indicates that Relate the table to another
-    private Ruta ruta;
+   @ManyToOne
+    @JoinColumn(name = "detalle_ruta_id", referencedColumnName = "id")
+    @JsonIdentityReference(alwaysAsId = false) // 👈 fuerza objeto completo
+    private DetalleRuta detalleRuta;
+
 }

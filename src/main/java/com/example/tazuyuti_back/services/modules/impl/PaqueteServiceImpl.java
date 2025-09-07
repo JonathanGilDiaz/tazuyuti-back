@@ -24,6 +24,7 @@ import com.example.tazuyuti_back.entities.modules.EntregarPaquete;
 import com.example.tazuyuti_back.entities.modules.EnviarPaquete;
 import com.example.tazuyuti_back.entities.modules.Paquete;
 import com.example.tazuyuti_back.entities.modules.RecibirPaquete;
+import com.example.tazuyuti_back.helpers.DocumentHelper;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.Utils;
 import com.example.tazuyuti_back.models.utilities.Pagination;
@@ -67,6 +68,9 @@ public class PaqueteServiceImpl implements PaqueteService {
     @Autowired
     private EntregarPaqueteRepository entregarPaqueteRepository;
 
+    @Autowired
+    private DocumentHelper documentHelper;
+
     @Override
     @Transactional
     public ResponseEntity<Response> save(Paquete paquete, HttpServletRequest request) {
@@ -81,7 +85,7 @@ public class PaqueteServiceImpl implements PaqueteService {
         String nombreSucursal = usuarioCompleto.getSucursal().getNombre();
         String letraSucursal = nombreSucursal.substring(0, 1).toUpperCase();
         long conteo = paqueteRepository.countByUsuario_Sucursal_Id(usuarioCompleto.getSucursal().getId());
-        String folio = letraSucursal + (conteo + 1);
+        String folio = "P" + letraSucursal + (conteo + 1);
         paquete.setFolio(folio);
         if (paquete.getDetallePaquete() != null) {
             paquete.getDetallePaquete().forEach(det -> det.setPaquete(paquete));
@@ -107,7 +111,7 @@ public class PaqueteServiceImpl implements PaqueteService {
         Specification<Paquete> specs = (Specification<Paquete>) data.get("specification");
         Specification<Paquete> filtroSucursal = (root, query, cb) -> cb.or(
                 cb.equal(root.get("usuario").get("sucursal").get("id"), sucursalId),
-                cb.equal(root.get("destino").get("sucursal").get("id"), sucursalId));
+                cb.equal(root.get("destino").get("id"), sucursalId));
         Specification<Paquete> finalSpecs = specs == null ? filtroSucursal : specs.and(filtroSucursal);
         Page<Paquete> list = paqueteRepository.findAll(finalSpecs, (Pageable) data.get("pageable"));
         if (list.hasContent()) {
@@ -172,6 +176,30 @@ public class PaqueteServiceImpl implements PaqueteService {
         paqueteRepository.actualizarEstado(dato.getPaquete().getId(), 4);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+    }
+
+    @Override
+    public ResponseEntity<Response> ticketInterno(int id) {
+        Optional<Paquete> ventaOp = paqueteRepository.findById(id);
+        if (ventaOp.isPresent()) {
+            Map<String, Object> pdfData = documentHelper.createTicketInterno(ventaOp.get());
+            return ResponseEntity.ok(new Response(true, "Ticket generado", pdfData));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "Venta no encontrada", null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response> ticketCliente(int id) {
+        Optional<Paquete> ventaOp = paqueteRepository.findById(id);
+        if (ventaOp.isPresent()) {
+            Map<String, Object> pdfData = documentHelper.createTicketPaquete(ventaOp.get());
+            return ResponseEntity.ok(new Response(true, "Ticket generado", pdfData));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "Venta no encontrada", null));
+        }
     }
 
 }

@@ -33,4 +33,9 @@ public interface PaqueteService {
     ResponseEntity<Response> recibir(RecibirPaquete dato);
 
     ResponseEntity<Response> entregar(EntregarPaquete dato);
+
+    ResponseEntity<Response> ticketInterno(int id);
+
+    ResponseEntity<Response> ticketCliente(int id);
+
 }

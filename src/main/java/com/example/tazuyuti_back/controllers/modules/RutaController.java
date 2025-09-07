@@ -46,7 +46,7 @@ public class RutaController {
             }
 
             String message = Utils.validateFilteringInformation(
-                    SystemText.Producto.OPCIONES_VALIDAS_PAGINACION, request.getSort(),
+                    SystemText.Rutas.OPCIONES_VALIDAS_PAGINACION, request.getSort(),
                     request.getFilters());
             if (message.equals("")) {
                 return service.index(request);
@@ -89,5 +89,10 @@ public class RutaController {
     public ResponseEntity<Response> update(@Valid @ModelAttribute @Validated(onCreate.class) Ruta ruta,
             HttpServletRequest request) {
         return service.update(ruta, request);
+    }
+
+    @GetMapping(value = "/ruta/{idPaquete}/rutasDisponibles")
+    public ResponseEntity<Response> rutasDisponibles(@PathVariable(name = "idPaquete", required = true) int id) {
+        return service.obtenerRutasDisponibles(id);
     }
 }

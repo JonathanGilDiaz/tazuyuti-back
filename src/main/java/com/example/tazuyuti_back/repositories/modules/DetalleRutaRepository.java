@@ -24,4 +24,7 @@ public interface DetalleRutaRepository
 
     boolean existsByRutaIdAndFecha(int rutaId, LocalDate fecha);
 
+    List<DetalleRuta> findByFechaAndEstadoTrue(LocalDate hoy);
+
+    List<DetalleRuta> findByEstadoTrueAndFechaAndSalida_Id(LocalDate fecha, int salidaId);
 }

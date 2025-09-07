@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.example.tazuyuti_back.entities.catalogs.Sucursal;
 import com.example.tazuyuti_back.entities.modules.DetalleRuta;
+import com.example.tazuyuti_back.entities.modules.Paquete;
 import com.example.tazuyuti_back.entities.modules.Ruta;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.Utils;
@@ -36,10 +38,10 @@ import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
 import com.example.tazuyuti_back.repositories.catalogs.SucursalRepository;
 import com.example.tazuyuti_back.repositories.modules.DetalleRutaRepository;
+import com.example.tazuyuti_back.repositories.modules.PaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.RutasRepository;
 import com.example.tazuyuti_back.repositories.modules.UnidadRepository;
 import com.example.tazuyuti_back.services.modules.RutaService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
@@ -58,7 +60,8 @@ public class RutasServiceImpl implements RutaService {
         @Autowired
         private SucursalRepository sucursalRepository;
 
-      
+        @Autowired
+        private PaqueteRepository paqueteRepository;
 
         @Override
         public ResponseEntity<Response> catalogs() {
@@ -265,11 +268,12 @@ public class RutasServiceImpl implements RutaService {
                 int capNueva = unidadNueva.getTipoCamioneta().getCapacidad();
                 int capAnterior = unidadAnterior.getTipoCamioneta().getCapacidad();
 
-                List<DetalleRuta> detalles = detalleRutaRepository
+                List<DetalleRuta> detallesViejos = detalleRutaRepository
                                 .findByRutaIdAndEstadoTrueOrderByFechaAscIdAsc(actual.getId());
 
+                // === Validación de capacidad con los detalles existentes ===
                 if (capNueva < capAnterior) {
-                        for (DetalleRuta d : detalles) {
+                        for (DetalleRuta d : detallesViejos) {
                                 var ocupados = parseOcupados(d.getOcupados());
                                 if (ocupados.size() > capNueva) {
                                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -288,6 +292,7 @@ public class RutasServiceImpl implements RutaService {
                         }
                 }
 
+                // === Actualiza datos principales de la ruta ===
                 actual.setUnidad(unidadNueva);
                 actual.setViaje(ruta.getViaje());
                 actual.setRepeticion(ruta.getRepeticion());
@@ -297,81 +302,98 @@ public class RutasServiceImpl implements RutaService {
                 }
                 rutasRepository.save(actual);
 
+                // === Guardar valores previos de ocupados/disponibilidad ===
+                Map<Integer, String> ocupadosPrevios = new HashMap<>();
+                Map<Integer, Integer> disponibilidadPrevios = new HashMap<>();
+                int idx = 0;
+                for (DetalleRuta d : detallesViejos) {
+                        ocupadosPrevios.put(idx, d.getOcupados());
+                        disponibilidadPrevios.put(idx, d.getDisponibilidad());
+                        idx++;
+                }
+
+                // === Borrar los detalles viejos ===
+                detalleRutaRepository.deleteAll(detallesViejos);
+
+                // === Regenerar detalles con misma lógica de save() ===
                 Sucursal oaxaca = sucursalRepository.findById(1).orElseThrow();
                 Sucursal huajuapam = sucursalRepository.findById(2).orElseThrow();
                 Sucursal tonala = sucursalRepository.findById(3).orElseThrow();
                 Sucursal juxtlahuaca = sucursalRepository.findById(4).orElseThrow();
 
-                int idxTramo = 0;
+                LocalTime horaBase = actual.getHora();
 
-                for (DetalleRuta d : detalles) {
-                        var t0 = actual.getHora();
-                        LocalDate fechaBase = d.getFecha(); // 👈 siempre respetar fecha de salida
+                // === Generar detalles para los próximos 3 días ===
+                List<DetalleRuta> nuevosDetalles = new ArrayList<>();
+                LocalDate hoy = LocalDate.now();
 
-                        if ("Oaxaca-Juxtlahuaca".equalsIgnoreCase(actual.getViaje())) {
-                                switch (idxTramo) {
-                                        case 0 -> {
-                                                d.setSalida(oaxaca);
-                                                d.setLlegada(huajuapam);
-                                                d.setSalidaHora(t0);
-                                                LocalTime llegada = t0.plusHours(3);
-                                                d.setLlegadaHora(llegada);
-                                        }
-                                        case 1 -> {
-                                                d.setSalida(huajuapam);
-                                                d.setLlegada(tonala);
-                                                LocalTime salidaHora = t0.plusHours(3);
-                                                LocalTime llegada = t0.plusHours(4).plusMinutes(30);
-                                                d.setSalidaHora(salidaHora);
-                                                d.setLlegadaHora(llegada);
-                                        }
-                                        case 2 -> {
-                                                d.setSalida(tonala);
-                                                d.setLlegada(juxtlahuaca);
-                                                LocalTime salidaHora = t0.plusHours(5).plusMinutes(30);
-                                                d.setSalidaHora(salidaHora);
-                                                d.setLlegadaHora(salidaHora); // mismo día
-                                        }
+                int generados = 0;
+                LocalDate fecha = hoy;
+
+                List<String> diasRepeticion = Arrays.stream(actual.getRepeticion().split(","))
+                                .map(String::toLowerCase)
+                                .toList();
+
+                while (generados < 3) {
+                        String diaSemana = fecha.getDayOfWeek()
+                                        .getDisplayName(TextStyle.FULL, new Locale("es", "MX"))
+                                        .toLowerCase();
+
+                        if (diasRepeticion.contains(diaSemana)) {
+                                if ("oaxaca-juxtlahuaca".equalsIgnoreCase(actual.getViaje())) {
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha, horaBase, oaxaca, huajuapam,
+                                                        3));
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha, horaBase.plusHours(3),
+                                                        huajuapam, tonala, 1.5));
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha,
+                                                        horaBase.plusHours(5).plusMinutes(30), tonala, juxtlahuaca, 2));
+                                } else if ("juxtlahuaca-oaxaca".equalsIgnoreCase(actual.getViaje())) {
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha, horaBase, juxtlahuaca,
+                                                        tonala, 2.5));
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha,
+                                                        horaBase.plusHours(2).plusMinutes(30), tonala, huajuapam, 2));
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha,
+                                                        horaBase.plusHours(4).plusMinutes(30), huajuapam, oaxaca, 1));
                                 }
-                        } else if ("Juxtlahuaca-Oaxaca".equalsIgnoreCase(actual.getViaje())) {
-                                switch (idxTramo) {
-                                        case 0 -> {
-                                                d.setSalida(juxtlahuaca);
-                                                d.setLlegada(tonala);
-                                                d.setSalidaHora(t0);
-                                                d.setLlegadaHora(t0.plusHours(2).plusMinutes(30));
-                                        }
-                                        case 1 -> {
-                                                d.setSalida(tonala);
-                                                d.setLlegada(huajuapam);
-                                                LocalTime salidaHora = t0.plusHours(2).plusMinutes(30);
-                                                LocalTime llegada = t0.plusHours(4).plusMinutes(30);
-                                                d.setSalidaHora(salidaHora);
-                                                d.setLlegadaHora(llegada);
-                                        }
-                                        case 2 -> {
-                                                d.setSalida(huajuapam);
-                                                d.setLlegada(oaxaca);
-                                                LocalTime salidaHora = t0.plusHours(4).plusMinutes(30);
-                                                LocalTime llegada = t0.plusHours(5).plusMinutes(30);
-                                                d.setSalidaHora(salidaHora);
-                                                d.setLlegadaHora(llegada);
-                                        }
-                                }
+                                generados++;
                         }
 
-                        if (d.getLlegadaHora().isAfter(d.getSalidaHora())) {
-                                d.setFecha(fechaBase.plusDays(1));
-                        } else {
-                                d.setFecha(fechaBase);
-                        }
+                        fecha = fecha.plusDays(1);
+                }
 
-                        detalleRutaRepository.save(d);
-                        idxTramo++;
-
+                for (int i = 0; i < nuevosDetalles.size(); i++) {
+                        nuevosDetalles.get(i).setOcupados(ocupadosPrevios.get(i));
+                        nuevosDetalles.get(i).setDisponibilidad(disponibilidadPrevios.get(i));
+                        detalleRutaRepository.save(nuevosDetalles.get(i));
                 }
 
                 return ResponseEntity.ok(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+        }
+
+        /**
+         * Igual que crearDetalle, pero no guarda en BD.
+         */
+        private DetalleRuta crearDetalleTemp(Ruta ruta, LocalDate fechaBase, LocalTime horaSalida,
+                        Sucursal salida, Sucursal llegada, double horasExtra) {
+                DetalleRuta detalle = new DetalleRuta();
+                detalle.setRuta(ruta);
+                detalle.setSalida(salida);
+                detalle.setLlegada(llegada);
+
+                detalle.setFecha(fechaBase);
+                detalle.setSalidaHora(horaSalida);
+
+                LocalTime horaLlegada = horaSalida.plusMinutes((long) (horasExtra * 60));
+                LocalDate fechaLlegada = fechaBase;
+
+                if (horaLlegada.isBefore(horaSalida)) { // cruzó de día
+                        fechaLlegada = fechaBase.plusDays(1);
+                }
+
+                detalle.setFecha(fechaLlegada);
+                detalle.setLlegadaHora(horaLlegada);
+
+                return detalle;
         }
 
         private Set<Integer> parseOcupados(String s) {
@@ -430,6 +452,38 @@ public class RutasServiceImpl implements RutaService {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                         .body(new Response(false, SystemText.General.REGISTRO_ENCONTRADO, null));
                 }
+        }
+
+        @Override
+        public ResponseEntity<Response> obtenerRutasDisponibles(int idPaquete) {
+                LocalDate hoy = LocalDate.now();
+
+                Paquete paquete = paqueteRepository.findById(idPaquete)
+                                .orElseThrow(() -> new RuntimeException("Paquete no encontrado"));
+
+                int origenId = paquete.getUsuario().getSucursal().getId();
+                int destinoId = paquete.getDestino().getId();
+
+                List<DetalleRuta> rutasDisponibles = detalleRutaRepository
+                                .findByEstadoTrueAndFechaAndSalida_Id(hoy, origenId);
+
+                List<DetalleRuta> filtradas;
+                if (destinoId > origenId) {
+                        filtradas = rutasDisponibles.stream()
+                                        .filter(d -> d.getLlegada().getId() > d.getSalida().getId())
+                                        .toList();
+                } else {
+                        filtradas = rutasDisponibles.stream()
+                                        .filter(d -> d.getLlegada().getId() < d.getSalida().getId())
+                                        .toList();
+                }
+
+                if (filtradas.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                        .body(new Response(false, "No hay rutas disponibles hacia ese destino", null));
+                }
+                return ResponseEntity.ok(
+                                new Response(true, SystemText.General.PROCESO_EXITOSO, filtradas));
         }
 
 }

@@ -21,4 +21,7 @@ public interface RutaService {
     ResponseEntity<Response> update(Ruta ruta, HttpServletRequest request);
 
     ResponseEntity<Response> detail(int id);
+
+    ResponseEntity<Response> obtenerRutasDisponibles(int destinoId);
+
 }
