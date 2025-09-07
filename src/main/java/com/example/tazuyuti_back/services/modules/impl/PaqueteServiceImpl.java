@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,17 +19,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.entities.catalogs.EstadoPaquete;
+import com.example.tazuyuti_back.entities.modules.CancelarPaquete;
+import com.example.tazuyuti_back.entities.modules.EntregarPaquete;
+import com.example.tazuyuti_back.entities.modules.EnviarPaquete;
 import com.example.tazuyuti_back.entities.modules.Paquete;
-import com.example.tazuyuti_back.entities.modules.Venta;
-import com.example.tazuyuti_back.helpers.DocumentHelper;
+import com.example.tazuyuti_back.entities.modules.RecibirPaquete;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.Utils;
 import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
 import com.example.tazuyuti_back.repositories.administration.UserRepository;
 import com.example.tazuyuti_back.repositories.catalogs.SucursalRepository;
+import com.example.tazuyuti_back.repositories.modules.CancelarPaqueteRepository;
+import com.example.tazuyuti_back.repositories.modules.EntregarPaqueteRepository;
+import com.example.tazuyuti_back.repositories.modules.EnviarPaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.PaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.PrecioPaqueteriaRepository;
+import com.example.tazuyuti_back.repositories.modules.RecibirPaqueteRepository;
 import com.example.tazuyuti_back.services.modules.PaqueteService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -45,13 +50,22 @@ public class PaqueteServiceImpl implements PaqueteService {
     private UserRepository userRepository;
 
     @Autowired
-    private DocumentHelper documentHelper;
-
-    @Autowired
     private PrecioPaqueteriaRepository precioPRepository;
 
     @Autowired
     private SucursalRepository sucursalRepository;
+
+    @Autowired
+    private CancelarPaqueteRepository cancelarPaqueteRepository;
+
+    @Autowired
+    private EnviarPaqueteRepository enviarPaqueteRepository;
+
+    @Autowired
+    private RecibirPaqueteRepository recibirPaqueteRepository;
+
+    @Autowired
+    private EntregarPaqueteRepository entregarPaqueteRepository;
 
     @Override
     @Transactional
@@ -73,7 +87,7 @@ public class PaqueteServiceImpl implements PaqueteService {
             paquete.getDetallePaquete().forEach(det -> det.setPaquete(paquete));
         }
         paquete.setFechaCreacion(Timestamp.valueOf(LocalDateTime.now()));
-        paquete.setEstado(new EstadoPaquete(1,"Recibido"));
+        paquete.setEstado(new EstadoPaquete(1, "Recibido"));
         Paquete paqueteGuardado = paqueteRepository.save(paquete);
         Map<String, Object> data = new HashMap<>();
         data.put("idPaquete", paqueteGuardado.getId());
@@ -91,8 +105,9 @@ public class PaqueteServiceImpl implements PaqueteService {
         int sucursalId = usuario.getSucursal().getId();
         Map<String, Object> data = Utils.getSpecificationAndPageable(requestT, Paquete.class);
         Specification<Paquete> specs = (Specification<Paquete>) data.get("specification");
-        Specification<Paquete> filtroSucursal = (root, query, cb) -> cb
-                .equal(root.get("usuario").get("sucursal").get("id"), sucursalId);
+        Specification<Paquete> filtroSucursal = (root, query, cb) -> cb.or(
+                cb.equal(root.get("usuario").get("sucursal").get("id"), sucursalId),
+                cb.equal(root.get("destino").get("sucursal").get("id"), sucursalId));
         Specification<Paquete> finalSpecs = specs == null ? filtroSucursal : specs.and(filtroSucursal);
         Page<Paquete> list = paqueteRepository.findAll(finalSpecs, (Pageable) data.get("pageable"));
         if (list.hasContent()) {
@@ -111,4 +126,52 @@ public class PaqueteServiceImpl implements PaqueteService {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response(true, SystemText.General.PROCESO_EXITOSO, response));
     }
+
+    @Override
+    public ResponseEntity<Response> detail(int id) {
+        Optional<Paquete> item = paqueteRepository.findById(id);
+        if (item.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new Response(true, SystemText.General.REGISTRO_ENCONTRADO, item.get()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.REGISTRO_ENCONTRADO, null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response> cancelar(CancelarPaquete dato) {
+        cancelarPaqueteRepository.save(dato);
+        paqueteRepository.actualizarEstado(dato.getPaquete().getId(), 5);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+
+    }
+
+    @Override
+    public ResponseEntity<Response> enviar(EnviarPaquete dato) {
+        enviarPaqueteRepository.save(dato);
+        paqueteRepository.actualizarEstado(dato.getPaquete().getId(), 2);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+
+    }
+
+    @Override
+    public ResponseEntity<Response> recibir(RecibirPaquete dato) {
+        recibirPaqueteRepository.save(dato);
+        paqueteRepository.actualizarEstado(dato.getPaquete().getId(), 3);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+
+    }
+
+    @Override
+    public ResponseEntity<Response> entregar(EntregarPaquete dato) {
+        entregarPaqueteRepository.save(dato);
+        paqueteRepository.actualizarEstado(dato.getPaquete().getId(), 4);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+    }
+
 }

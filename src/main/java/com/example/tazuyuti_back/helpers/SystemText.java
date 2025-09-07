@@ -289,4 +289,8 @@ public class SystemText {
         public static final String OPCIONES_VALIDAS_PAGINACION = "id,folio,fechaCreacion,usuario.nombre,usuario.sucursal.nombre,remitente,destino.nombre,destinatario,total,estado.nombre";
     }
 
+    public static class Rutas {
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,viaje,hora,unidad.nombre,unidad.usuario.nombre,unidad.tipoCamioneta.nombre,unidad.tipoCamioneta.capacidad,repeticion";
+    }
+
 }

@@ -6,7 +6,6 @@
 package com.example.tazuyuti_back.repositories.modules;
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.example.tazuyuti_back.entities.modules.Unidad;
@@ -14,4 +13,7 @@ import com.example.tazuyuti_back.entities.modules.Unidad;
 public interface UnidadRepository extends JpaRepository<Unidad, Integer>, JpaSpecificationExecutor<Unidad> {
 
         List<Unidad> findByUsuarioId(Integer usuarioId);
+
+        List<Unidad> findByEstadoTrue();
+
 }

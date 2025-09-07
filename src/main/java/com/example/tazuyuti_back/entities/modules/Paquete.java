@@ -113,4 +113,13 @@ public class Paquete {
     @Schema(description = "Arreglo de los detalles de la venta")        // This annotation indicates that information for the swagger        // This annotation indicates that information for the swagger
     @OneToMany(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePaquete> detallePaquete = null;
+
+    @OneToOne(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CancelarPaquete cancelacion;
+
+    @OneToOne(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true)
+    private EnviarPaquete envio;
+
+    @OneToOne(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RecibirPaquete recibo;
 }
