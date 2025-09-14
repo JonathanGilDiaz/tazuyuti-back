@@ -293,4 +293,12 @@ public class SystemText {
         public static final String OPCIONES_VALIDAS_PAGINACION = "id,viaje,hora,unidad.nombre,unidad.usuario.nombre,unidad.tipoCamioneta.nombre,unidad.tipoCamioneta.capacidad,repeticion";
     }
 
+    public static class PrecioBoleto {
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,origen.nombre,destino,ubicacion,precio,entre2.nombre,entre1.nombre";
+    }
+
+      public static class Taquilla {
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,fechaSalida,viaje,asientos,cliente,estado";
+    }
+
 }

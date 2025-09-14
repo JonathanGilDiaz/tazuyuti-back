@@ -5,13 +5,10 @@
  */
 package com.example.tazuyuti_back.repositories.modules;
 
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import com.example.tazuyuti_back.entities.modules.PrecioEquipaje;
+ import com.example.tazuyuti_back.entities.modules.DetalleBoleto;
 
-public interface PrecioEquipajeRepository
-        extends JpaRepository<PrecioEquipaje, Integer>, JpaSpecificationExecutor<PrecioEquipaje> {
+public interface DetalleBoletoRepository extends JpaRepository<DetalleBoleto, Integer>, JpaSpecificationExecutor<DetalleBoleto> {
 
-    List<PrecioEquipaje> findByEstadoTrue();
 }

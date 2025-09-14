@@ -49,7 +49,6 @@ public class DetalleRuta {
     @JoinColumn(name = "ruta_id", referencedColumnName = "id")                // This annotation indicates that Relate the table to another
     private Ruta ruta;
 
-
     @NotNull(groups = { onCreate.class, onUpdate.class }, message = "La fecha es requerida")
     @Schema(description = "Fecha de la ruta", example = "2025-09-05")
     @Column(name = "fecha", nullable = false)
