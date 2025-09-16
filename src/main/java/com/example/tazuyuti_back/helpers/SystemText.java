@@ -298,7 +298,7 @@ public class SystemText {
     }
 
       public static class Taquilla {
-        public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,fechaSalida,viaje,asientos,cliente,estado";
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,fechaSalida,viaje,asientos,cliente,estado,total";
     }
 
 }

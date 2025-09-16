@@ -103,7 +103,6 @@ public class RutasServiceImpl implements RutaService {
                                         .orElseThrow(() -> new RuntimeException("Sucursal Juxtlahuaca no encontrada"));
 
                         LocalDate hoy = LocalDate.now();
-                        LocalTime horaActual = LocalTime.now();
 
                         List<String> diasRepeticion = Arrays.stream(ruta.getRepeticion().split(","))
                                         .map(String::toLowerCase)
@@ -116,24 +115,27 @@ public class RutasServiceImpl implements RutaService {
                                 String diaSemana = fecha.getDayOfWeek()
                                                 .getDisplayName(TextStyle.FULL, new Locale("es", "MX"))
                                                 .toLowerCase();
-
+                                System.out.println("dia de la semana " + diaSemana);
                                 if (diasRepeticion.contains(diaSemana)) {
-                                        if (!fecha.equals(hoy) || horaActual.isBefore(ruta.getHora())) {
+                                        if (!fecha.equals(hoy)) {
                                                 if ("oaxaca-juxtlahuaca".equalsIgnoreCase(ruta.getViaje())) {
-                                                        crearDetalle(rutaGuardada, fecha, ruta.getHora(),
+                                                        LocalDate fechaSalidaM = crearDetalle(rutaGuardada, fecha,
+                                                                        ruta.getHora(),
                                                                         sucursalOaxaca, sucursalHuajuapam, 3);
-                                                        crearDetalle(rutaGuardada, fecha, ruta.getHora().plusHours(3),
+                                                        fechaSalidaM = crearDetalle(rutaGuardada, fechaSalidaM,
+                                                                        ruta.getHora().plusHours(3),
                                                                         sucursalHuajuapam, sucursalTonala, 1.5);
-                                                        crearDetalle(rutaGuardada, fecha,
-                                                                        ruta.getHora().plusHours(5).plusMinutes(30),
-                                                                        sucursalTonala, sucursalJuxtlahuaca, 0);
+                                                        fechaSalidaM = crearDetalle(rutaGuardada, fechaSalidaM,
+                                                                        ruta.getHora().plusHours(4).plusMinutes(30),
+                                                                        sucursalTonala, sucursalJuxtlahuaca, 1);
                                                 } else if ("juxtlahuaca-oaxaca".equalsIgnoreCase(ruta.getViaje())) {
-                                                        crearDetalle(rutaGuardada, fecha, ruta.getHora(),
+                                                        LocalDate fechaSalidaM = crearDetalle(rutaGuardada, fecha,
+                                                                        ruta.getHora(),
                                                                         sucursalJuxtlahuaca, sucursalTonala, 2.5);
-                                                        crearDetalle(rutaGuardada, fecha,
+                                                        fechaSalidaM = crearDetalle(rutaGuardada, fechaSalidaM,
                                                                         ruta.getHora().plusHours(2).plusMinutes(30),
                                                                         sucursalTonala, sucursalHuajuapam, 2);
-                                                        crearDetalle(rutaGuardada, fecha,
+                                                        fechaSalidaM = crearDetalle(rutaGuardada, fechaSalidaM,
                                                                         ruta.getHora().plusHours(4).plusMinutes(30),
                                                                         sucursalHuajuapam, sucursalOaxaca, 1);
                                                 }
@@ -152,7 +154,7 @@ public class RutasServiceImpl implements RutaService {
                 }
         }
 
-        private void crearDetalle(Ruta ruta, LocalDate fechaBase, LocalTime horaSalida,
+        private LocalDate crearDetalle(Ruta ruta, LocalDate fechaBase, LocalTime horaSalida,
                         Sucursal salida, Sucursal llegada, double horasExtra) {
                 DetalleRuta detalle = new DetalleRuta();
                 detalle.setRuta(ruta);
@@ -162,15 +164,26 @@ public class RutasServiceImpl implements RutaService {
                 detalle.setFecha(fechaBase);
                 detalle.setSalidaHora(horaSalida);
 
+                // Calcula la hora de llegada sumando horasExtra
                 LocalTime horaLlegada = horaSalida.plusMinutes((long) (horasExtra * 60));
+
+                // Inicializa fechaLlegada como fechaBase
                 LocalDate fechaLlegada = fechaBase;
-                if (horaLlegada.isAfter(horaSalida)) {
-                        fechaLlegada = fechaBase.plusDays(1);
+
+                // Si la hora de llegada es antes de la hora de salida, significa que pasó a
+                // otro día
+                LocalDate diaSiguiente = fechaLlegada;
+                if (horaLlegada.isBefore(horaSalida)) {
+                        diaSiguiente = fechaBase.plusDays(1);
                 }
+
                 detalle.setFecha(fechaLlegada);
                 detalle.setLlegadaHora(horaLlegada);
 
                 detalleRutaRepository.save(detalle);
+
+                // Retorna la fecha de llegada calculada
+                return diaSiguiente;
         }
 
         @Scheduled(cron = "0 0 * * * *")
@@ -204,18 +217,19 @@ public class RutasServiceImpl implements RutaService {
 
                         if (!existe && diasRepeticion.contains(diaSemana)) {
                                 if ("oaxaca-juxtlahuaca".equalsIgnoreCase(ruta.getViaje())) {
-                                        crearDetalle(ruta, fecha, ruta.getHora(),
+                                        LocalDate fechaSalidaM = crearDetalle(ruta, fecha, ruta.getHora(),
                                                         sucursalOaxaca, sucursalHuajuapam, 3);
-                                        crearDetalle(ruta, fecha, ruta.getHora().plusHours(3),
+                                        fechaSalidaM = crearDetalle(ruta, fechaSalidaM, ruta.getHora().plusHours(3),
                                                         sucursalHuajuapam, sucursalTonala, 1.5);
-                                        crearDetalle(ruta, fecha, ruta.getHora().plusHours(5).plusMinutes(30),
-                                                        sucursalTonala, sucursalJuxtlahuaca, 0);
+                                        crearDetalle(ruta, fechaSalidaM, ruta.getHora().plusHours(4).plusMinutes(30),
+                                                        sucursalTonala, sucursalJuxtlahuaca, 1);
                                 } else if ("juxtlahuaca-oaxaca".equalsIgnoreCase(ruta.getViaje())) {
-                                        crearDetalle(ruta, fecha, ruta.getHora(),
+                                        LocalDate fechaSalidaM = crearDetalle(ruta, fecha, ruta.getHora(),
                                                         sucursalJuxtlahuaca, sucursalTonala, 2.5);
-                                        crearDetalle(ruta, fecha, ruta.getHora().plusHours(2).plusMinutes(30),
+                                        fechaSalidaM = crearDetalle(ruta, fechaSalidaM,
+                                                        ruta.getHora().plusHours(2).plusMinutes(30),
                                                         sucursalTonala, sucursalHuajuapam, 2);
-                                        crearDetalle(ruta, fecha, ruta.getHora().plusHours(4).plusMinutes(30),
+                                        crearDetalle(ruta, fechaSalidaM, ruta.getHora().plusHours(4).plusMinutes(30),
                                                         sucursalHuajuapam, sucursalOaxaca, 1);
                                 }
                         }
@@ -343,16 +357,24 @@ public class RutasServiceImpl implements RutaService {
                                 if ("oaxaca-juxtlahuaca".equalsIgnoreCase(actual.getViaje())) {
                                         nuevosDetalles.add(crearDetalleTemp(actual, fecha, horaBase, oaxaca, huajuapam,
                                                         3));
-                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha, horaBase.plusHours(3),
+                                        LocalDate fechaSalidaM = crearDetalle(actual, fecha, horaBase, oaxaca,
+                                                        huajuapam, 3);
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fechaSalidaM, horaBase.plusHours(3),
                                                         huajuapam, tonala, 1.5));
-                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha,
-                                                        horaBase.plusHours(5).plusMinutes(30), tonala, juxtlahuaca, 2));
+                                        fechaSalidaM = crearDetalle(actual, fechaSalidaM, horaBase.plusHours(3),
+                                                        huajuapam, tonala, 1.5);
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fechaSalidaM,
+                                                        horaBase.plusHours(4).plusMinutes(30), tonala, juxtlahuaca, 1));
                                 } else if ("juxtlahuaca-oaxaca".equalsIgnoreCase(actual.getViaje())) {
                                         nuevosDetalles.add(crearDetalleTemp(actual, fecha, horaBase, juxtlahuaca,
                                                         tonala, 2.5));
-                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha,
+                                        LocalDate fechaSalidaM = crearDetalle(actual, fecha, horaBase, juxtlahuaca,
+                                                        tonala, 2.5);
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fechaSalidaM,
                                                         horaBase.plusHours(2).plusMinutes(30), tonala, huajuapam, 2));
-                                        nuevosDetalles.add(crearDetalleTemp(actual, fecha,
+                                        fechaSalidaM = crearDetalle(actual, fechaSalidaM,
+                                                        horaBase.plusHours(2).plusMinutes(30), tonala, huajuapam, 2);
+                                        nuevosDetalles.add(crearDetalleTemp(actual, fechaSalidaM,
                                                         horaBase.plusHours(4).plusMinutes(30), huajuapam, oaxaca, 1));
                                 }
                                 generados++;

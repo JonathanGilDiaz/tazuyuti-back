@@ -22,4 +22,10 @@ public interface BoletoService {
 
     ResponseEntity<Response> save(Boleto boleto, HttpServletRequest request);
 
+    ResponseEntity<Response> detail(int id);
+
+    ResponseEntity<Response> ticket(int id);
+
+    ResponseEntity<Response> cancelar(int id);
+
 }

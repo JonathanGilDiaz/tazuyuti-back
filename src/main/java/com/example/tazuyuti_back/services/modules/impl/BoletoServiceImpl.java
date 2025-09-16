@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +29,7 @@ import com.example.tazuyuti_back.entities.modules.DetalleRuta;
 import com.example.tazuyuti_back.entities.modules.PrecioBoleto;
 import com.example.tazuyuti_back.entities.modules.Ruta;
 import com.example.tazuyuti_back.entities.modules.Unidad;
+import com.example.tazuyuti_back.helpers.DocumentHelper;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.Utils;
 import com.example.tazuyuti_back.models.utilities.Pagination;
@@ -64,6 +65,9 @@ public class BoletoServiceImpl implements BoletoService {
 
     @Autowired
     private PrecioEquipajeRepository precioEquipajeRepository;
+
+    @Autowired
+    private DocumentHelper documentHelper;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -118,8 +122,8 @@ public class BoletoServiceImpl implements BoletoService {
                 Ruta ruta = d.getRuta();
                 Unidad unidad = ruta.getUnidad();
 
-               List<DetalleRuta> tramos = new ArrayList<DetalleRuta>();
-               tramos.add(d);
+                List<DetalleRuta> tramos = new ArrayList<DetalleRuta>();
+                tramos.add(d);
                 tramos.add(detalleRutaRepository.findById(d.getId() + 1).get());
                 tramos.add(detalleRutaRepository.findById(d.getId() + 2).get());
 
@@ -143,7 +147,7 @@ public class BoletoServiceImpl implements BoletoService {
                 for (DetalleRuta tramo : tramosFiltrados) {
                     if (tramo.getOcupados() != null) {
                         Arrays.stream(tramo.getOcupados().split(","))
-                                .map(String::trim) 
+                                .map(String::trim)
                                 .filter(s -> !s.isBlank())
                                 .map(Integer::parseInt)
                                 .forEach(ocupadosUnion::add);
@@ -200,32 +204,28 @@ public class BoletoServiceImpl implements BoletoService {
                     .orElseThrow(() -> new RuntimeException("DetalleRuta salida no encontrada"));
 
             Ruta ruta = salida.getRuta();
-            int origenId = salida.getSalida().getId();
-            int destinoId = precio.getEntre2() != null ? precio.getEntre2().getId() : precio.getOrigen().getId();
-
-            // Tramos de la ruta para ese día
-            List<DetalleRuta> tramos = detalleRutaRepository.findByRutaIdAndEstadoTrue(ruta.getId())
-                    .stream()
-                    .filter(t -> (t.getFecha().isAfter(salida.getFecha()) || t.getFecha().isEqual(salida.getFecha())) &&
-                            (t.getSalidaHora().isAfter(salida.getSalidaHora())
-                                    || t.getFecha().isAfter(salida.getFecha())))
-                    .sorted(Comparator.comparing(DetalleRuta::getFecha)
-                            .thenComparing(DetalleRuta::getSalidaHora))
-                    .toList();
 
             // Filtrar tramos que van del origen al destino
-            List<DetalleRuta> tramosViaje = tramos.stream()
-                    .filter(t -> {
-                        int s = t.getSalida().getId();
-                        int l = t.getLlegada().getId();
-                        if (origenId < destinoId) {
-                            return s >= origenId && l <= destinoId && s < l;
-                        } else {
-                            return s <= origenId && l >= destinoId && s > l;
-                        }
-                    })
-                    .sorted(Comparator.comparing(DetalleRuta::getSalidaHora))
-                    .toList();
+            List<DetalleRuta> tramosViaje = new ArrayList<DetalleRuta>();
+            tramosViaje.add(salida);
+            int idDetalleRutaSalida = salida.getId();
+            int sucursaLSalida = salida.getSalida().getId();
+            System.out.println("El id de la sucrusal " + idDetalleRutaSalida);
+            boolean bandera = true;
+            while (bandera) {
+                if (detalleRutaRepository.findById(idDetalleRutaSalida).get().getLlegada().getId() == precio.getEntre2()
+                        .getId()) {
+                    bandera = false;
+                    break;
+                }
+                if (sucursaLSalida < precio.getEntre2().getId()) {
+                    tramosViaje.add(detalleRutaRepository.findById(idDetalleRutaSalida + 1).get());
+                    idDetalleRutaSalida++;
+                } else {
+                    tramosViaje.add(detalleRutaRepository.findById(idDetalleRutaSalida - 1).get());
+                    idDetalleRutaSalida--;
+                }
+            }
 
             if (tramosViaje.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -307,6 +307,8 @@ public class BoletoServiceImpl implements BoletoService {
 
             // 🔹 Fecha y hora de salida = fecha del primer tramo del viaje
             DetalleRuta primerTramo = tramosViaje.get(0);
+            System.out.println("tramosViaje " + tramosViaje.size());
+            System.out.println("La fecha : " + primerTramo.getFecha() + " la hora: " + primerTramo.getSalidaHora());
             boleto.setFechaSalida(
                     Timestamp.valueOf(primerTramo.getFecha().atTime(primerTramo.getSalidaHora())));
 
@@ -327,6 +329,134 @@ public class BoletoServiceImpl implements BoletoService {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new Response(false, "Error al guardar boleto: " + e.getMessage(), null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response> detail(int id) {
+        Optional<Boleto> item = boletoRepository.findById(id);
+        if (item.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new Response(true, SystemText.General.REGISTRO_ENCONTRADO, item.get()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.REGISTRO_ENCONTRADO, null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response> ticket(int id) {
+        Optional<Boleto> ventaOp = boletoRepository.findById(id);
+        if (ventaOp.isPresent()) {
+            Map<String, Object> pdfData = documentHelper.createTicketBoleto(ventaOp.get());
+            return ResponseEntity.ok(new Response(true, "Ticket generado", pdfData));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "Venta no encontrada", null));
+        }
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<Response> cancelar(int boletoId) {
+        try {
+            // 1. Buscar el boleto
+            Boleto boleto = boletoRepository.findById(boletoId)
+                    .orElseThrow(() -> new RuntimeException("Boleto no encontrado"));
+
+            if ("Cancelado".equalsIgnoreCase(boleto.getEstado())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new Response(false, "El boleto ya está cancelado.", null));
+            }
+
+            if (!boleto.getDetalleRutaSalida().getEstado()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new Response(false, "No se puede cancelar, el recorrido ya ha comenzado.", null));
+
+            }
+
+            // 2. Obtener salida y destino
+            DetalleRuta salida = detalleRutaRepository.findById(boleto.getDetalleRutaSalida().getId())
+                    .orElseThrow(() -> new RuntimeException("DetalleRuta salida no encontrada"));
+
+            PrecioBoleto precio = precioBoletoRepository.findById(boleto.getPrecioBoleto().getId())
+                    .orElseThrow(() -> new RuntimeException("Precio no encontrado"));
+
+            Ruta ruta = salida.getRuta();
+
+            // 3. Tramos de la ruta para ese día (misma lógica que en save)
+            List<DetalleRuta> tramosViaje = new ArrayList<DetalleRuta>();
+            tramosViaje.add(salida);
+            int idDetalleRutaSalida = salida.getId();
+            int sucursaLSalida = salida.getSalida().getId();
+            System.out.println("El id de la sucrusal " + idDetalleRutaSalida);
+            boolean bandera = true;
+            while (bandera) {
+                if (detalleRutaRepository.findById(idDetalleRutaSalida).get().getLlegada().getId() == precio.getEntre2()
+                        .getId()) {
+                    bandera = false;
+                    break;
+                }
+                if (sucursaLSalida < precio.getEntre2().getId()) {
+                    tramosViaje.add(detalleRutaRepository.findById(idDetalleRutaSalida + 1).get());
+                    idDetalleRutaSalida++;
+                } else {
+                    tramosViaje.add(detalleRutaRepository.findById(idDetalleRutaSalida - 1).get());
+                    idDetalleRutaSalida--;
+                }
+            }
+
+            if (tramosViaje.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new Response(false, "No se encontraron tramos para cancelar.", null));
+            }
+
+            // 5. Asientos que deben liberarse
+            Set<Integer> asientosCancelados = Arrays.stream(boleto.getAsientos().split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isBlank())
+                    .map(Integer::parseInt)
+                    .collect(HashSet::new, HashSet::add, HashSet::addAll);
+
+            // 6. Actualizar ocupados en cada tramo
+            for (DetalleRuta tramo : tramosViaje) {
+                Set<Integer> ocupados = new HashSet<>();
+                if (tramo.getOcupados() != null) {
+                    Arrays.stream(tramo.getOcupados().split(","))
+                            .map(String::trim)
+                            .filter(s -> !s.isBlank())
+                            .map(Integer::parseInt)
+                            .forEach(ocupados::add);
+                }
+
+                // Eliminar los asientos cancelados
+                ocupados.removeAll(asientosCancelados);
+
+                // Guardar ocupados actualizados
+                tramo.setOcupados(
+                        ocupados.stream()
+                                .sorted()
+                                .map(String::valueOf)
+                                .reduce((a, b) -> a + "," + b)
+                                .orElse(""));
+
+                // Recalcular disponibilidad
+                int capacidad = ruta.getUnidad().getTipoCamioneta().getCapacidad();
+                tramo.setDisponibilidad(capacidad - ocupados.size());
+
+                detalleRutaRepository.save(tramo);
+            }
+
+            // 7. Actualizar boleto como cancelado
+            boleto.setEstado("Cancelado");
+            boletoRepository.save(boleto);
+
+            return ResponseEntity.ok(new Response(true, "Boleto cancelado con éxito.", boleto));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Response(false, "Error al cancelar boleto: " + e.getMessage(), null));
         }
     }
 

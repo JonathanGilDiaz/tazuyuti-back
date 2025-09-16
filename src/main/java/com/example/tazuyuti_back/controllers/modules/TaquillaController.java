@@ -77,4 +77,19 @@ public class TaquillaController {
         return service.save(venta, request);
     }
 
+    @GetMapping(value = "/taquilla/{id}/detail")
+    public ResponseEntity<Response> detail(@PathVariable(name = "id", required = true) int id) {
+        return service.detail(id);
+    }
+
+    @GetMapping(value = "/taquilla/{id}/ticket")
+    public ResponseEntity<Response> ticket(@PathVariable(name = "id", required = true) int id) {
+        return service.ticket(id);
+    }
+
+    @GetMapping(value = "/taquilla/{id}/cancelar")
+    public ResponseEntity<Response> cancelar(@PathVariable(name = "id", required = true) int id) {
+        return service.cancelar(id);
+    }
+
 }

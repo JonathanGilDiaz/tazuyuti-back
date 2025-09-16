@@ -15,6 +15,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.example.tazuyuti_back.entities.modules.Boleto;
+import com.example.tazuyuti_back.entities.modules.DetalleBoleto;
+import com.example.tazuyuti_back.entities.modules.DetalleEquipajeBoleto;
 import com.example.tazuyuti_back.entities.modules.DetallePaquete;
 import com.example.tazuyuti_back.entities.modules.DetalleVenta;
 import com.example.tazuyuti_back.entities.modules.Paquete;
@@ -373,6 +376,150 @@ public class DocumentHelper {
             response.put("archivo", Utils.encodeFileToBase64(archivoPdf));
             new File(archivoPdf).delete();
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    public Map<String, Object> createTicketBoleto(Boleto boleto) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            DateTimeFormatter fmtNombre = DateTimeFormatter.ofPattern("dd_MM_yyyy_HH_mm_ss");
+            String nombrePdf = "ticket_boleto_" + (boleto.getFolio() != null ? boleto.getFolio().trim() : "SN")
+                    + "_" + LocalDateTime.now().format(fmtNombre) + ".pdf";
+            String archivoPdf = directoryDocumento + nombrePdf;
+
+            File f = new File(archivoPdf);
+            if (f.exists())
+                f.delete();
+
+            String logoBase64 = "data:" + Utils.getMime("png") + ";base64," +
+                    Utils.encodeFileToBase64Binary(directoryImages + "logo_ticket.png");
+
+            String sucursalNombre = boleto.getUsuario() != null && boleto.getUsuario().getSucursal() != null
+                    ? boleto.getUsuario().getSucursal().getNombre()
+                    : "";
+            String sucursalHorario = boleto.getUsuario() != null && boleto.getUsuario().getSucursal() != null
+                    ? boleto.getUsuario().getSucursal().getHorario()
+                    : "";
+            String sucursalDir = boleto.getUsuario() != null && boleto.getUsuario().getSucursal() != null
+                    ? boleto.getUsuario().getSucursal().getDireccion()
+                    : "";
+            String sucursalTel = boleto.getUsuario() != null && boleto.getUsuario().getSucursal() != null
+                    ? boleto.getUsuario().getSucursal().getTelefono()
+                    : "";
+
+            String fechaStr = boleto.getFechaCreacion() != null
+                    ? boleto.getFechaCreacion().toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yy HH:mm"))
+                    : LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yy HH:mm"));
+            StringBuilder conceptos = new StringBuilder();
+            for (DetalleBoleto det : boleto.getDetalleBoletos()) {
+                String tipoB = "";
+                if (det.isNino()) {
+                    tipoB = "Boleto Niño";
+                } else {
+                    tipoB = "Boleto Adulto";
+                }
+                conceptos.append("<tr>")
+                        .append("<td>").append(det.getCantidad()).append("</td>")
+                        .append("<td>").append(tipoB).append("</td>")
+                        .append("<td>$").append(String.format("%.2f", det.getPrecio())).append("</td>")
+                        .append("<td>$").append(String.format("%.2f", det.getSubtotal())).append("</td>")
+                        .append("</tr>");
+            }
+            for (DetalleEquipajeBoleto det : boleto.getDetalleEquipajeBoleto()) {
+                conceptos.append("<tr>")
+                        .append("<td>").append(det.getCantidad()).append("</td>")
+                        .append("<td>").append(det.getPrecioEquipaje().getNombre()).append("</td>")
+                        .append("<td>$").append(String.format("%.2f", det.getPrecio())).append("</td>")
+                        .append("<td>$").append(String.format("%.2f", det.getSubtotal())).append("</td>")
+                        .append("</tr>");
+            }
+            java.util.function.Function<Double, String> money = v -> "$"
+                    + String.format(Locale.US, "%,.2f", (v != null ? v : 0d));
+            // ---------- HTML ----------
+            StringBuilder html = new StringBuilder();
+            html.append("<html><head><meta charset='UTF-8'></head>")
+                    .append("<body style='font-family: monospace; font-size:12px; font-weight:900; text-align:center; width:80mm;'>")
+
+                    // Logo
+                    .append("<div><img src='").append(logoBase64)
+                    .append("' style='width:65mm; margin-bottom:5px;'/></div>")
+
+                    // Encabezado empresa/sucursal
+                    .append("<div style='font-size:13px; font-weight:900;'>Tazuyuti SA de CV</div>")
+                    .append("<div style='margin:2px 0;'>Sucursal: ").append(escapeHtml(sucursalNombre)).append("</div>")
+                    .append("<div style='margin:2px 0;'>Encargado: Señora Mara</div>")
+                    .append("<div style='margin:2px 0;'>Régimen simplificado de confianza</div>")
+                    .append("<div style='margin:2px 0;'>").append(escapeHtml(sucursalHorario)).append("</div>")
+                    .append("<div style='margin:2px 0;'>").append(escapeHtml(sucursalDir)).append("</div>")
+                    .append("<div style='margin:2px 0;'>").append(escapeHtml(sucursalTel)).append("</div>")
+
+                    .append("<hr/>")
+
+                    // Fecha + Folio
+                    .append("<div style='text-align:left; display:flex; justify-content:space-between; margin:2px 0;'>")
+                    .append("<span>Fecha: ").append(escapeHtml(fechaStr)).append("</span>")
+                    .append("<span>Folio: <b>").append(escapeHtml(boleto.getFolio())).append("</b></span>")
+                    .append("</div>")
+
+                    // Datos envío
+                    .append("<div style='text-align:left; margin-top:6px;'>")
+                    .append("<div>Atendió: ").append(escapeHtml(boleto.getUsuario().getNombre())).append("</div>")
+                    .append("<div>Viaje: ").append(escapeHtml(boleto.getViaje())).append("</div>")
+                    .append("<div>Salida: ").append(escapeHtml(boleto.getFechaSalida().toString())).append("</div>")
+                    .append("<div>Asientos: ").append(escapeHtml(boleto.getAsientos())).append("</div>")
+                    .append("<div>Titular: ").append(escapeHtml(boleto.getCliente())).append("</div>")
+                    .append("</div>")
+
+                    .append("<hr/>")
+
+                    // Tabla conceptos
+                    .append("<table style='width:100%; font-size:12px; text-align:center; border-collapse:collapse;'>")
+                    .append("<thead>")
+                    .append("<tr>")
+                    .append("<th style='border-bottom:1px solid #000;'>Cant</th>")
+                    .append("<th style='border-bottom:1px solid #000;'>Descripcion</th>")
+                    .append("<th style='border-bottom:1px solid #000;'>Precio</th>")
+                    .append("<th style='border-bottom:1px solid #000;'>Importe</th>")
+                    .append("</tr>")
+                    .append("</thead>")
+                    .append("<tbody>").append(conceptos).append("</tbody>")
+                    .append("</table>")
+
+                    .append("<hr/>")
+
+                    // Totales
+                    .append("<div style='text-align:right; font-size:13px; font-weight:900;'>TOTAL: ")
+                    .append(money.apply(boleto.getTotal())).append("</div>");
+
+            // Si fue efectivo, mostrar pago y cambio
+            String fp = boleto.getFormaPago() != null ? boleto.getFormaPago() : "";
+            if (fp.toLowerCase().contains("efectivo")) {
+                html.append("<p style='text-align:right;'>Pago: ").append(money.apply(boleto.getPago())).append("</p>")
+                        .append("<p style='text-align:right;'>Cambio: ").append(money.apply(boleto.getCambio()))
+                        .append("</p>");
+            }
+
+            html.append("<br/><p style='margin-top:10px;'>*** Gracias por su preferencia ***</p>")
+                    .append("</body></html>");
+
+            // ---------- PDF ----------
+            PdfWriter writer = new PdfWriter(archivoPdf);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            pdfDoc.setDefaultPageSize(new PageSize(226, 600));
+            Document document = new Document(pdfDoc);
+            document.setMargins(5, 5, 5, 5);
+
+            List<IElement> elements = HtmlConverter.convertToElements(html.toString());
+            for (IElement element : elements) {
+                document.add((IBlockElement) element);
+            }
+            document.close();
+
+            response.put("archivo", Utils.encodeFileToBase64(archivoPdf));
+            new File(archivoPdf).delete();
         } catch (Exception e) {
             e.printStackTrace();
         }
