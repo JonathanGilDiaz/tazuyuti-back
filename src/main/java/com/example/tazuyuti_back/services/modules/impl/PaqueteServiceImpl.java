@@ -7,7 +7,9 @@ package com.example.tazuyuti_back.services.modules.impl;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.entities.catalogs.EstadoPaquete;
 import com.example.tazuyuti_back.entities.modules.CancelarPaquete;
+import com.example.tazuyuti_back.entities.modules.DetalleRuta;
+import com.example.tazuyuti_back.entities.modules.DetalleRutasViajePaquete;
 import com.example.tazuyuti_back.entities.modules.EntregarPaquete;
 import com.example.tazuyuti_back.entities.modules.EnviarPaquete;
 import com.example.tazuyuti_back.entities.modules.Paquete;
@@ -32,6 +36,8 @@ import com.example.tazuyuti_back.models.utilities.Response;
 import com.example.tazuyuti_back.repositories.administration.UserRepository;
 import com.example.tazuyuti_back.repositories.catalogs.SucursalRepository;
 import com.example.tazuyuti_back.repositories.modules.CancelarPaqueteRepository;
+import com.example.tazuyuti_back.repositories.modules.DetalleRutaRepository;
+import com.example.tazuyuti_back.repositories.modules.DetalleRutasViajePaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.EntregarPaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.EnviarPaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.PaqueteRepository;
@@ -70,6 +76,12 @@ public class PaqueteServiceImpl implements PaqueteService {
 
     @Autowired
     private DocumentHelper documentHelper;
+
+    @Autowired
+    private DetalleRutaRepository detalleRutaRepository;
+
+    @Autowired
+    private DetalleRutasViajePaqueteRepository detalleRutasViajePaqueteRepository;
 
     @Override
     @Transactional
@@ -156,6 +168,40 @@ public class PaqueteServiceImpl implements PaqueteService {
     public ResponseEntity<Response> enviar(EnviarPaquete dato) {
         enviarPaqueteRepository.save(dato);
         paqueteRepository.actualizarEstado(dato.getPaquete().getId(), 2);
+
+        List<DetalleRutasViajePaquete> detalleRutasViajeList = new ArrayList<>();
+        int idDetalleRutaSalida = dato.getDetalleRuta().getId();
+        int sucursaLSalida = dato.getDetalleRuta().getSalida().getId();
+        boolean bandera = true;
+        while (bandera) {
+            if (detalleRutaRepository.findById(idDetalleRutaSalida).get().getLlegada().getId() == dato.getPaquete()
+                    .getDestino().getId()) {
+                bandera = false;
+                break;
+            }
+            if (sucursaLSalida < dato.getPaquete()
+                    .getDestino().getId()) {
+                DetalleRuta rutaAgregar = detalleRutaRepository.findById(idDetalleRutaSalida + 1).get();
+                DetalleRutasViajePaquete detalleRutasViaje = new DetalleRutasViajePaquete();
+                detalleRutasViaje.setDetalleRuta(rutaAgregar);
+                detalleRutasViaje.setPaquete(dato.getPaquete());
+                detalleRutasViajeList.add(detalleRutasViaje);
+
+                idDetalleRutaSalida++;
+            } else {
+                DetalleRuta rutaAgregar = detalleRutaRepository.findById(idDetalleRutaSalida - 1).get();
+                DetalleRutasViajePaquete detalleRutasViaje = new DetalleRutasViajePaquete();
+                detalleRutasViaje.setDetalleRuta(rutaAgregar);
+                detalleRutasViaje.setPaquete(dato.getPaquete());
+                detalleRutasViajeList.add(detalleRutasViaje);
+                idDetalleRutaSalida--;
+            }
+        }
+
+        for (DetalleRutasViajePaquete relacion : detalleRutasViajeList) {
+            detalleRutasViajePaqueteRepository.save(relacion);
+        }
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
 

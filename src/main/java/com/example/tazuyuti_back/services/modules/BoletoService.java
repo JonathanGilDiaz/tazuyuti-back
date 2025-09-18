@@ -6,6 +6,8 @@
 package com.example.tazuyuti_back.services.modules;
 
 import org.springframework.http.ResponseEntity;
+
+import com.example.tazuyuti_back.entities.modules.Bitacora;
 import com.example.tazuyuti_back.entities.modules.Boleto;
 import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
@@ -27,5 +29,11 @@ public interface BoletoService {
     ResponseEntity<Response> ticket(int id);
 
     ResponseEntity<Response> cancelar(int id);
+
+    ResponseEntity<Response> indexBitacoras(int user, Pagination request);
+
+    ResponseEntity<Response> cerrarViaje(Bitacora bitacora);
+
+    ResponseEntity<Response> detailDetalleRuta(int id);
 
 }

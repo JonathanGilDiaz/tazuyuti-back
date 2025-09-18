@@ -5,11 +5,10 @@
  */
 package com.example.tazuyuti_back.entities.modules;
 
-import java.time.LocalTime;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.validator.onCreate;
 import com.example.tazuyuti_back.validator.onUpdate;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,8 +31,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @ToString
-@Table(schema = "modulos", name = "ruta")
-public class Ruta {
+@Table(schema = "modulos", name = "detalle_rutas_viaje_paquete")
+public class DetalleRutasViajePaquete {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,27 +41,16 @@ public class Ruta {
     @Column(name = "id")
     private int id;
 
-    @ManyToOne
-    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }")
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El Usuario es requerido")
-    @JoinColumn(name = "unidad_id", referencedColumnName = "id")
-    private Unidad unidad;
+    @JsonBackReference
+    @ManyToOne(optional = false) // 🔹 Un detalle pertenece a UNA venta
+    @JoinColumn(name = "paquete_id", referencedColumnName = "id", nullable = false)
+    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "La venta es requerida")
+    private Paquete paquete;
 
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "viaje requerido")
-    @Column(name = "viaje", nullable = false)
-    private String viaje;
 
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "repeticion requerido")
-    @Column(name = "repeticion", nullable = false)
-    private String repeticion;
-
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "La hora es requerida")
-    @Schema(description = "Hora de salida", example = "08:30:00")
-    @Column(name = "hora", nullable = false)
-    @JsonFormat(pattern = "HH:mm")
-    private LocalTime hora;
-
-    @Builder.Default
-    @Column(name = "estado", nullable = true)
-    private Boolean estado = true;
+    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }")        // This annotation indicates that information for the swagger
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El tipo de camioneta es requerido")            // This annotation indicates that this parameter must not be null.
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "detalle_ruta_id", referencedColumnName = "id")                // This annotation indicates that Relate the table to another
+    private DetalleRuta detalleRuta;
 }

@@ -1,5 +1,7 @@
 package com.example.tazuyuti_back.repositories.modules;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,4 +20,10 @@ public interface PaqueteRepository extends JpaRepository<Paquete, Integer>, JpaS
         @Transactional
         @Query("UPDATE Paquete p SET p.estado.id = :estadoId WHERE p.id = :paqueteId")
         int actualizarEstado(@Param("paqueteId") int paqueteId, @Param("estadoId") int estadoId);
+
+        @Query("SELECT p FROM Paquete p " +
+                        "JOIN p.envio e " +
+                        "WHERE e.detalleRuta.id = :idDetalleRuta " +
+                        "AND p.estado.id <> 5")
+        List<Paquete> findByDetalleRutaAndEstadoNot5(@Param("idDetalleRuta") Integer idDetalleRuta);
 }

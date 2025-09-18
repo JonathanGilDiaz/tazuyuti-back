@@ -78,7 +78,6 @@ public class DetalleRuta {
     @Column(name = "llegada_hora", nullable = false)
     private LocalTime llegadaHora;
 
-    @Builder.Default
     @Column(name = "estado", nullable = true)
-    private Boolean estado = true;
+    private String estado;
 }

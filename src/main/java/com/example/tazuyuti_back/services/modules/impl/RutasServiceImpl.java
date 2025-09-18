@@ -131,13 +131,13 @@ public class RutasServiceImpl implements RutaService {
                                                 } else if ("juxtlahuaca-oaxaca".equalsIgnoreCase(ruta.getViaje())) {
                                                         LocalDate fechaSalidaM = crearDetalle(rutaGuardada, fecha,
                                                                         ruta.getHora(),
-                                                                        sucursalJuxtlahuaca, sucursalTonala, 2.5);
+                                                                        sucursalJuxtlahuaca, sucursalTonala, 1);
+                                                        fechaSalidaM = crearDetalle(rutaGuardada, fechaSalidaM,
+                                                                        ruta.getHora().plusHours(1),
+                                                                        sucursalTonala, sucursalHuajuapam, 1.5);
                                                         fechaSalidaM = crearDetalle(rutaGuardada, fechaSalidaM,
                                                                         ruta.getHora().plusHours(2).plusMinutes(30),
-                                                                        sucursalTonala, sucursalHuajuapam, 2);
-                                                        fechaSalidaM = crearDetalle(rutaGuardada, fechaSalidaM,
-                                                                        ruta.getHora().plusHours(4).plusMinutes(30),
-                                                                        sucursalHuajuapam, sucursalOaxaca, 1);
+                                                                        sucursalHuajuapam, sucursalOaxaca, 3);
                                                 }
                                                 generados++;
                                         }
@@ -170,8 +170,6 @@ public class RutasServiceImpl implements RutaService {
                 // Inicializa fechaLlegada como fechaBase
                 LocalDate fechaLlegada = fechaBase;
 
-                // Si la hora de llegada es antes de la hora de salida, significa que pasó a
-                // otro día
                 LocalDate diaSiguiente = fechaLlegada;
                 if (horaLlegada.isBefore(horaSalida)) {
                         diaSiguiente = fechaBase.plusDays(1);
@@ -179,10 +177,9 @@ public class RutasServiceImpl implements RutaService {
 
                 detalle.setFecha(fechaLlegada);
                 detalle.setLlegadaHora(horaLlegada);
-
+                detalle.setEstado("Activo");
                 detalleRutaRepository.save(detalle);
 
-                // Retorna la fecha de llegada calculada
                 return diaSiguiente;
         }
 
@@ -225,12 +222,12 @@ public class RutasServiceImpl implements RutaService {
                                                         sucursalTonala, sucursalJuxtlahuaca, 1);
                                 } else if ("juxtlahuaca-oaxaca".equalsIgnoreCase(ruta.getViaje())) {
                                         LocalDate fechaSalidaM = crearDetalle(ruta, fecha, ruta.getHora(),
-                                                        sucursalJuxtlahuaca, sucursalTonala, 2.5);
+                                                        sucursalJuxtlahuaca, sucursalTonala, 1);
                                         fechaSalidaM = crearDetalle(ruta, fechaSalidaM,
-                                                        ruta.getHora().plusHours(2).plusMinutes(30),
-                                                        sucursalTonala, sucursalHuajuapam, 2);
-                                        crearDetalle(ruta, fechaSalidaM, ruta.getHora().plusHours(4).plusMinutes(30),
-                                                        sucursalHuajuapam, sucursalOaxaca, 1);
+                                                        ruta.getHora().plusHours(1),
+                                                        sucursalTonala, sucursalHuajuapam, 1.5);
+                                        crearDetalle(ruta, fechaSalidaM, ruta.getHora().plusHours(2).plusMinutes(30),
+                                                        sucursalHuajuapam, sucursalOaxaca, 3);
                                 }
                         }
                 }
@@ -367,15 +364,15 @@ public class RutasServiceImpl implements RutaService {
                                                         horaBase.plusHours(4).plusMinutes(30), tonala, juxtlahuaca, 1));
                                 } else if ("juxtlahuaca-oaxaca".equalsIgnoreCase(actual.getViaje())) {
                                         nuevosDetalles.add(crearDetalleTemp(actual, fecha, horaBase, juxtlahuaca,
-                                                        tonala, 2.5));
+                                                        tonala, 1));
                                         LocalDate fechaSalidaM = crearDetalle(actual, fecha, horaBase, juxtlahuaca,
-                                                        tonala, 2.5);
+                                                        tonala, 1);
                                         nuevosDetalles.add(crearDetalleTemp(actual, fechaSalidaM,
-                                                        horaBase.plusHours(2).plusMinutes(30), tonala, huajuapam, 2));
+                                                        horaBase.plusHours(1), tonala, huajuapam, 1.5));
                                         fechaSalidaM = crearDetalle(actual, fechaSalidaM,
-                                                        horaBase.plusHours(2).plusMinutes(30), tonala, huajuapam, 2);
+                                                        horaBase.plusHours(1), tonala, huajuapam, 1.5);
                                         nuevosDetalles.add(crearDetalleTemp(actual, fechaSalidaM,
-                                                        horaBase.plusHours(4).plusMinutes(30), huajuapam, oaxaca, 1));
+                                                        horaBase.plusHours(2).plusMinutes(30), huajuapam, oaxaca, 3));
                                 }
                                 generados++;
                         }
@@ -487,7 +484,7 @@ public class RutasServiceImpl implements RutaService {
                 int destinoId = paquete.getDestino().getId();
 
                 List<DetalleRuta> rutasDisponibles = detalleRutaRepository
-                                .findByEstadoTrueAndFechaAndSalida_Id(hoy, origenId);
+                                .findByEstadoAndFechaAndSalida_Id("Activo",hoy, origenId);
 
                 List<DetalleRuta> filtradas;
                 if (destinoId > origenId) {

@@ -26,7 +26,7 @@ public interface DetalleRutaRepository
 
     List<DetalleRuta> findByFechaAndEstadoTrue(LocalDate hoy);
 
-    List<DetalleRuta> findByEstadoTrueAndFechaAndSalida_Id(LocalDate fecha, int salidaId);
+    List<DetalleRuta> findByEstadoAndFechaAndSalida_Id(String estado, LocalDate fecha, int salidaId);
 
     List<DetalleRuta> findByRutaIdAndFechaAndEstadoTrue(int rutaId, LocalDate fecha);
 

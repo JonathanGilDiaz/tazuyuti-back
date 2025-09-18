@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +26,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.tazuyuti_back.entities.administration.User;
+import com.example.tazuyuti_back.entities.modules.Bitacora;
 import com.example.tazuyuti_back.entities.modules.Boleto;
 import com.example.tazuyuti_back.entities.modules.DetalleRuta;
+import com.example.tazuyuti_back.entities.modules.DetalleRutasViaje;
+import com.example.tazuyuti_back.entities.modules.DetalleRutasViajePaquete;
+import com.example.tazuyuti_back.entities.modules.Paquete;
 import com.example.tazuyuti_back.entities.modules.PrecioBoleto;
 import com.example.tazuyuti_back.entities.modules.Ruta;
 import com.example.tazuyuti_back.entities.modules.Unidad;
@@ -36,12 +42,15 @@ import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
 import com.example.tazuyuti_back.repositories.administration.UserRepository;
 import com.example.tazuyuti_back.repositories.catalogs.SucursalRepository;
+import com.example.tazuyuti_back.repositories.modules.BitacoraRepository;
 import com.example.tazuyuti_back.repositories.modules.BoletoRepository;
 import com.example.tazuyuti_back.repositories.modules.DetalleRutaRepository;
+import com.example.tazuyuti_back.repositories.modules.DetalleRutasViajePaqueteRepository;
+import com.example.tazuyuti_back.repositories.modules.DetalleRutasViajeRepository;
+import com.example.tazuyuti_back.repositories.modules.PaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.PrecioBoletoRepository;
 import com.example.tazuyuti_back.repositories.modules.PrecioEquipajeRepository;
 import com.example.tazuyuti_back.services.modules.BoletoService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
@@ -68,6 +77,18 @@ public class BoletoServiceImpl implements BoletoService {
 
     @Autowired
     private DocumentHelper documentHelper;
+
+    @Autowired
+    private BitacoraRepository bitacoraRepository;
+
+    @Autowired
+    private PaqueteRepository paqueteRepository;
+
+    @Autowired
+    private DetalleRutasViajeRepository detalleRutasViajeRepository;
+
+    @Autowired
+    private DetalleRutasViajePaqueteRepository detalleRutasViajePaqueteRepository;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -109,7 +130,7 @@ public class BoletoServiceImpl implements BoletoService {
             int destino = precio.getEntre2() != null ? precio.getEntre2().getId() : precio.getOrigen().getId();
 
             List<DetalleRuta> detalles = detalleRutaRepository
-                    .findByEstadoTrueAndFechaAndSalida_Id(fechaBuscada, origen);
+                    .findByEstadoAndFechaAndSalida_Id("Activo", fechaBuscada, origen);
 
             if (detalles.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -205,12 +226,11 @@ public class BoletoServiceImpl implements BoletoService {
 
             Ruta ruta = salida.getRuta();
 
-            // Filtrar tramos que van del origen al destino
+            List<DetalleRutasViaje> detalleRutasViajeList = new ArrayList<>();
             List<DetalleRuta> tramosViaje = new ArrayList<DetalleRuta>();
             tramosViaje.add(salida);
             int idDetalleRutaSalida = salida.getId();
             int sucursaLSalida = salida.getSalida().getId();
-            System.out.println("El id de la sucrusal " + idDetalleRutaSalida);
             boolean bandera = true;
             while (bandera) {
                 if (detalleRutaRepository.findById(idDetalleRutaSalida).get().getLlegada().getId() == precio.getEntre2()
@@ -219,10 +239,24 @@ public class BoletoServiceImpl implements BoletoService {
                     break;
                 }
                 if (sucursaLSalida < precio.getEntre2().getId()) {
-                    tramosViaje.add(detalleRutaRepository.findById(idDetalleRutaSalida + 1).get());
+                    DetalleRuta rutaAgregar = detalleRutaRepository.findById(idDetalleRutaSalida + 1).get();
+                    tramosViaje.add(rutaAgregar);
+
+                    DetalleRutasViaje detalleRutasViaje = new DetalleRutasViaje();
+                    detalleRutasViaje.setDetalleRuta(rutaAgregar);
+                    detalleRutasViaje.setBoleto(boleto);
+                    detalleRutasViajeList.add(detalleRutasViaje);
+
                     idDetalleRutaSalida++;
                 } else {
-                    tramosViaje.add(detalleRutaRepository.findById(idDetalleRutaSalida - 1).get());
+                    DetalleRuta rutaAgregar = detalleRutaRepository.findById(idDetalleRutaSalida - 1).get();
+                    tramosViaje.add(rutaAgregar);
+
+                    DetalleRutasViaje detalleRutasViaje = new DetalleRutasViaje();
+                    detalleRutasViaje.setDetalleRuta(rutaAgregar);
+                    detalleRutasViaje.setBoleto(boleto);
+                    detalleRutasViajeList.add(detalleRutasViaje);
+
                     idDetalleRutaSalida--;
                 }
             }
@@ -323,6 +357,11 @@ public class BoletoServiceImpl implements BoletoService {
 
             boletoRepository.save(boleto);
 
+            for (DetalleRutasViaje relacion : detalleRutasViajeList) {
+                relacion.setBoleto(boleto); // asegurar que tenga el boleto ya persistido
+                detalleRutasViajeRepository.save(relacion);
+            }
+
             return ResponseEntity.ok(new Response(true, SystemText.General.PROCESO_EXITOSO, boleto));
 
         } catch (Exception e) {
@@ -369,7 +408,7 @@ public class BoletoServiceImpl implements BoletoService {
                         .body(new Response(false, "El boleto ya está cancelado.", null));
             }
 
-            if (!boleto.getDetalleRutaSalida().getEstado()) {
+            if ("Cerrado".equals(boleto.getDetalleRutaSalida().getEstado())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(new Response(false, "No se puede cancelar, el recorrido ya ha comenzado.", null));
 
@@ -457,6 +496,109 @@ public class BoletoServiceImpl implements BoletoService {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new Response(false, "Error al cancelar boleto: " + e.getMessage(), null));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public ResponseEntity<Response> indexBitacoras(int idUsuario, Pagination requestT) {
+        User usuario = userRepository.findById(idUsuario).get();
+        int sucursalId = usuario.getSucursal().getId();
+        Map<String, Object> data = Utils.getSpecificationAndPageable(requestT, DetalleRuta.class);
+        Specification<DetalleRuta> specs = (Specification<DetalleRuta>) data.get("specification");
+        Specification<DetalleRuta> filtroSucursal = (root, query, cb) -> cb
+                .equal(root.get("salida").get("id"), sucursalId);
+        Specification<DetalleRuta> finalSpecs = specs == null ? filtroSucursal : specs.and(filtroSucursal);
+        Page<DetalleRuta> list = detalleRutaRepository.findAll(finalSpecs, (Pageable) data.get("pageable"));
+        if (list.hasContent()) {
+            return ResponseEntity.ok(new Response(true, SystemText.General.PROCESO_EXITOSO, list));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Response> cerrarViaje(Bitacora bitacora) {
+        try {
+            Optional<DetalleRuta> item = detalleRutaRepository.findById(bitacora.getDetalleRuta().getId());
+            if (!item.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
+            }
+
+            DetalleRuta detalleRuta = item.get();
+            detalleRuta.setEstado("Cerrado");
+            detalleRutaRepository.save(detalleRuta);
+
+            List<Boleto> boletos = boletoRepository.findByDetalleRutaSalida_IdAndEstado(detalleRuta.getId(), "Activo");
+
+            if (boletos.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new Response(false, "No se encontraron boletos para este viaje", null));
+            }
+
+            double total = boletos.stream()
+                    .mapToDouble(Boleto::getTotal)
+                    .sum();
+
+            String nombreSucursal = bitacora.getUsuario().getSucursal().getNombre();
+            String letraSucursal = nombreSucursal.substring(0, 1).toUpperCase();
+            long conteo = /* necesitas un repository para bitácora */
+                    bitacoraRepository.countByUsuario_Sucursal_Id(bitacora.getUsuario().getSucursal().getId());
+            String folio = "C" + letraSucursal + (conteo + 1);
+
+            // 🔹 4. Completar la bitácora
+            bitacora.setTotal(total);
+            bitacora.setFolio(folio);
+            bitacora.setDetalleRuta(detalleRuta);
+
+            bitacoraRepository.save(bitacora);
+
+            return ResponseEntity.ok(new Response(true, "Viaje cerrado con éxito", bitacora));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Response(false, "Error al cerrar viaje: " + e.getMessage(), null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response> detailDetalleRuta(int id) {
+        Optional<DetalleRuta> item = detalleRutaRepository.findById(id);
+
+        if (item.isPresent()) {
+            DetalleRuta detalleRuta = item.get();
+
+            List<Boleto> boletos = boletoRepository.findByDetalleRutaSalida_IdAndEstado(id, "Activo");
+            List<Paquete> paquetes = paqueteRepository.findByDetalleRutaAndEstadoNot5(id);
+
+            List<DetalleRutasViaje> detalleRutasViajeActivos = detalleRutasViajeRepository
+                    .findByDetalleRuta_IdAndBoleto_Estado(id, "Activo");
+            List<Boleto> boletosSiguen = detalleRutasViajeActivos.stream()
+                    .map(DetalleRutasViaje::getBoleto)
+                    .collect(Collectors.toList());
+
+            List<DetalleRutasViajePaquete> detalleRutasViajePaquetesActivos = detalleRutasViajePaqueteRepository
+                    .findByDetalleRutaAndPaqueteEstadoNot5(id);
+
+            List<Paquete> paquetesSiguen = detalleRutasViajePaquetesActivos.stream()
+                    .map(DetalleRutasViajePaquete::getPaquete)
+                    .collect(Collectors.toList());
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("detalleRuta", detalleRuta);
+            responseData.put("boletosEnviados", boletos);
+            responseData.put("paquetesEnviados", paquetes);
+            responseData.put("boletosSiguen", boletosSiguen);
+            responseData.put("paquetesSiguen", paquetesSiguen);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new Response(true, SystemText.General.REGISTRO_ENCONTRADO, responseData));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
         }
     }
 
