@@ -117,7 +117,7 @@ public class TaquillaController {
             }
 
             String message = Utils.validateFilteringInformation(
-                    SystemText.Taquilla.OPCIONES_VALIDAS_PAGINACION, request.getSort(),
+                    SystemText.Taquilla.OPCIONES_VALIDAS_PAGINACION_BITACORA, request.getSort(),
                     request.getFilters());
             if (message.equals("")) {
                 return service.indexBitacoras(idUsuario, request);

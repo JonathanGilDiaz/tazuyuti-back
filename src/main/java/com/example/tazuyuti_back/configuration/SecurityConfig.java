@@ -33,7 +33,7 @@ public class SecurityConfig {
         "/api/v3/api-docs/**",
         "/webjars/**",
         "/api/usuarios/save",
-        "/api/ruta/save",
+        "/api/corte/crear",
     };
 
     @Bean

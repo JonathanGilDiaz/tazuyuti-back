@@ -48,9 +48,9 @@ public class DetalleRutasViaje {
     private Boleto boleto;
 
 
-    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }")        // This annotation indicates that information for the swagger
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El tipo de camioneta es requerido")            // This annotation indicates that this parameter must not be null.
+    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }")        
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El tipo de camioneta es requerido")            
     @ManyToOne(optional = false)
-    @JoinColumn(name = "detalle_ruta_id", referencedColumnName = "id")                // This annotation indicates that Relate the table to another
+    @JoinColumn(name = "detalle_ruta_id", referencedColumnName = "id")                
     private DetalleRuta detalleRuta;
 }

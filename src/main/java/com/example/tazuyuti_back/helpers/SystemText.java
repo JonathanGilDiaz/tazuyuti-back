@@ -299,6 +299,7 @@ public class SystemText {
 
       public static class Taquilla {
         public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,fechaSalida,viaje,asientos,cliente,estado,total";
+        public static final String OPCIONES_VALIDAS_PAGINACION_BITACORA = "id,salida.nombre,llegada.nombre,fecha,salidaHora,ruta.unidad.nombre,ruta.unidad.capacidad,ruta.unidad.usuario.nombre,estado";
     }
 
 }

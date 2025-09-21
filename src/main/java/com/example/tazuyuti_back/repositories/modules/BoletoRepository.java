@@ -5,6 +5,7 @@
  */
 package com.example.tazuyuti_back.repositories.modules;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,20 +14,28 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.entities.modules.Boleto;
 
 public interface BoletoRepository extends JpaRepository<Boleto, Integer>, JpaSpecificationExecutor<Boleto> {
 
-    long countByUsuario_Sucursal_Id(int sucursalId);
+        long countByUsuario_Sucursal_Id(int sucursalId);
 
-    List<Boleto> findByDetalleRutaSalida_IdAndEstado(Integer idDetalleRuta, String estado);
+        List<Boleto> findByDetalleRutaSalida_IdAndEstado(Integer idDetalleRuta, String estado);
 
-    @Query("SELECT b FROM Boleto b " +
-            "WHERE b.detalleRutaSalida.id = :idDetalleRuta " +
-            "AND b.estado = 'Activo' " +
-            "AND DATE(b.fechaSalida) BETWEEN :fechaAnterior AND :fechaDetalle")
-    List<Boleto> findValidBoletos(@Param("idDetalleRuta") Integer idDetalleRuta,
-            @Param("fechaAnterior") LocalDate fechaAnterior,
-            @Param("fechaDetalle") LocalDate fechaDetalle);
+        @Query("SELECT b FROM Boleto b " +
+                        "WHERE b.detalleRutaSalida.id = :idDetalleRuta " +
+                        "AND b.estado = 'Activo' " +
+                        "AND DATE(b.fechaSalida) BETWEEN :fechaAnterior AND :fechaDetalle")
+        List<Boleto> findValidBoletos(@Param("idDetalleRuta") Integer idDetalleRuta,
+                        @Param("fechaAnterior") LocalDate fechaAnterior,
+                        @Param("fechaDetalle") LocalDate fechaDetalle);
 
+        List<Boleto> findByUsuarioAndFechaCreacionAfterAndEstado(User usuario, Timestamp fecha, String estado);
+
+        List<Boleto> findByUsuarioAndFechaCreacionBetweenAndEstado(
+                        User usuario,
+                        Timestamp inicio,
+                        Timestamp fin,
+                        String estado);
 }

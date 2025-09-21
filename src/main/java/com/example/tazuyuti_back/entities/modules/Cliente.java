@@ -42,43 +42,43 @@ public class Cliente {
     @Column(name = "id")
     private Integer id;
 
-    @Schema(description = "Nombre del cliente", example = "Jonathan")        // This annotation indicates that information for the swagger
-    @Column(name = "nombre", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @Schema(description = "Nombre del cliente", example = "Jonathan")        
+    @Column(name = "nombre", nullable = true)         
     private String nombre;
 
-    @Schema(description = "Apellido paterno  del cliente", example = "Diaz")        // This annotation indicates that information for the swagger
-    @Column(name = "apellido_paterno", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @Schema(description = "Apellido paterno  del cliente", example = "Diaz")        
+    @Column(name = "apellido_paterno", nullable = true)         
     private String apellidoPaterno;
 
-    @Schema(description = "Apellido materno del cliente", example = "Diaz")        // This annotation indicates that information for the swagger
-    @Column(name = "apellido_Materno", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @Schema(description = "Apellido materno del cliente", example = "Diaz")        
+    @Column(name = "apellido_Materno", nullable = true)         
     private String apellidoMaterno;
 
-    @Column(name = "nombre_comercial", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @Column(name = "nombre_comercial", nullable = true)         
     private String nombreComercial;
 
-    @Column(name = "rfc", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @Column(name = "rfc", nullable = true)         
     private String rfc;
 
-     @Column(name = "sociedad", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+     @Column(name = "sociedad", nullable = true)         
     private String sociedad;
 
-       @Column(name = "telefono", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+       @Column(name = "telefono", nullable = true)         
     private String telefono;
 
-       @Column(name = "regimen_fiscal", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+       @Column(name = "regimen_fiscal", nullable = true)         
     private String regimenFiscal;
 
-       @Column(name = "direccion", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+       @Column(name = "direccion", nullable = true)         
     private String direccion;
 
-       @Column(name = "codigo_postal", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+       @Column(name = "codigo_postal", nullable = true)         
     private double codigoPostal;
 
-       @Column(name = "tipo_persona", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+       @Column(name = "tipo_persona", nullable = true)         
     private String tipoPersona;
 
-     @Column(name = "estado", nullable = true)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+     @Column(name = "estado", nullable = true)         
     private boolean estado;
 
     @CreationTimestamp

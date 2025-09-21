@@ -21,6 +21,7 @@ import com.example.tazuyuti_back.helpers.ToolHelper;
 import com.example.tazuyuti_back.models.administration.AuthCredentials;
 import com.example.tazuyuti_back.models.administration.UserDetail;
 import com.example.tazuyuti_back.models.utilities.Response;
+import com.example.tazuyuti_back.repositories.modules.CorteRepository;
 import com.example.tazuyuti_back.services.administration.MenuService;
 import com.example.tazuyuti_back.services.administration.RecaptchaService;
 import com.example.tazuyuti_back.services.administration.SessionService;
@@ -61,64 +62,87 @@ public class AuthController {
     @Autowired
     private RecaptchaService recaptchaService;
 
+    @Autowired
+    private CorteRepository corteRepository;
+
     @Value("${jwt.sessionLifetime}")
     private Long SessionLifetime;
 
     @Value("${rsa.private_key_pem}")
     private String privateKeyPem;
 
-
     /**
-    * Authenticates a user using the provided credentials.
-    *
-    * @param authCredentials Contains the user's email and password for authentication.
-    *                        - correo: Email to log in.
-    *                        - password: Password to log in.
-    * @return Response indicating whether authentication was successful, including a message and any relevant data.
-    */
+     * Authenticates a user using the provided credentials.
+     *
+     * @param authCredentials Contains the user's email and password for
+     *                        authentication.
+     *                        - correo: Email to log in.
+     *                        - password: Password to log in.
+     * @return Response indicating whether authentication was successful, including
+     *         a message and any relevant data.
+     */
     @PostMapping("/login")
-    public ResponseEntity<Response> authenticateUser(@RequestBody @Validated(onCreate.class) AuthCredentials authCredentials, HttpServletRequest request) {
+    public ResponseEntity<Response> authenticateUser(
+            @RequestBody @Validated(onCreate.class) AuthCredentials authCredentials, HttpServletRequest request) {
         try {
             if (!recaptchaService.verifyRecaptcha(authCredentials.getRecaptchaResponse(), false)) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, SystemText.Login.VALIDACION_CAPTCHA_FALLO, null));
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new Response(false, SystemText.Login.VALIDACION_CAPTCHA_FALLO, null));
             }
 
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authCredentials.getUsuario(), authCredentials.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    authCredentials.getUsuario(), authCredentials.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            
+
             UserDetail usuarioDetail = (UserDetail) authentication.getPrincipal();
             if (authentication.getPrincipal() != null) {
                 if (usuarioDetail.getUsuario().getActivo()) {
                     User usuario = usuarioDetail.getUsuario();
+                    if (usuario.getRol().getId() != 5) {
+                        boolean tieneCorteAbierto = corteRepository.findFirstByUsuarioAndEstado(usuario, "Abierto")
+                                .isPresent();
+
+                        if (!tieneCorteAbierto) {
+                            HashMap<String, Object> responseError = new HashMap<>();
+                            responseError.put("usuarioId", usuario.getId());
+                            return ResponseEntity
+                                    .status(HttpStatus.LOCKED)
+                                    .body(new Response(false, "Falta crear un corte para iniciar sesión",
+                                            responseError));
+                        }
+                    }
                     Timestamp dateNow = ToolHelper.castDateTime(ToolHelper.getCurrentDateTime());
                     Timestamp endDate = new Timestamp(dateNow.getTime() + (SessionLifetime * 1_000));
                     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                    
+
                     String claimName = usuario.getNombre();
                     String token = jwtService.getToken(userDetails, claimName);
-                    //update sesion
+                    // update sesion
                     sessionService.setUpdateActivo(false, usuario, dateNow);
-                    Session session = Session.builder().usuario(usuario).token(token).fecha_inicio(dateNow).fecha_fin(endDate).build();
-                    //register session
+                    Session session = Session.builder().usuario(usuario).token(token).fecha_inicio(dateNow)
+                            .fecha_fin(endDate).build();
+                    // register session
                     sessionService.save(session);
                     List<Menu> menus = menuService.findByRolIdAndOpcionNivel(usuario.getRol().getId(), 1);
-                    List< HashMap<String, Object>> opcionesMenu = new ArrayList<>();
+                    List<HashMap<String, Object>> opcionesMenu = new ArrayList<>();
                     for (Menu menu : menus) {
-                        
-                        List<Menu> subMenus = menuService.findByRolIdAndDepensAndOpcionNivel(usuario.getRol().getId(), menu.getId(), 2);
-                    
+
+                        List<Menu> subMenus = menuService.findByRolIdAndDepensAndOpcionNivel(usuario.getRol().getId(),
+                                menu.getId(), 2);
+
                         List<HashMap<String, Object>> subMenusList = new ArrayList<>();
                         for (Menu subMenu : subMenus) {
-                            List<Menu> subSubMenus = menuService.findByRolIdAndDepensAndOpcionNivel(usuario.getRol().getId(), subMenu.getOpcion().getId(), 3);
-                            HashMap<String, Object> subMenuMap = new HashMap<>(subMenu.toMap()); 
-                            subMenuMap.put("subMenus", subSubMenus); 
+                            List<Menu> subSubMenus = menuService.findByRolIdAndDepensAndOpcionNivel(
+                                    usuario.getRol().getId(), subMenu.getOpcion().getId(), 3);
+                            HashMap<String, Object> subMenuMap = new HashMap<>(subMenu.toMap());
+                            subMenuMap.put("subMenus", subSubMenus);
                             subMenusList.add(subMenuMap);
                         }
                         HashMap<String, Object> opt = new HashMap<>();
                         opt.put("menu", menu);
                         opt.put("subMenus", subMenusList);
-                                     opcionesMenu.add(opt);
-                        }
+                        opcionesMenu.add(opt);
+                    }
                     HashMap<String, Object> usuarioMap = new HashMap<>();
                     usuarioMap.put("id", usuario.getId());
                     usuarioMap.put("usuario", usuario.getUsuario());
@@ -130,31 +154,33 @@ public class AuthController {
                     response.put("token", token);
                     response.put("usuario", usuarioMap);
                     response.put("menus", opcionesMenu);
-					return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.PROCESO_EXITOSO, response));
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new Response(true, SystemText.General.PROCESO_EXITOSO, response));
                 } else {
-					return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, SystemText.Login.USUARIO_INACTIVO, null));
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body(new Response(false, SystemText.Login.USUARIO_INACTIVO, null));
                 }
             } else {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, SystemText.Login.CREDENCIALES_INVALIDAS, null));
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new Response(false, SystemText.Login.CREDENCIALES_INVALIDAS, null));
             }
         } catch (AuthenticationException ex) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, ex.getMessage(), null));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, ex.getMessage(), null));
         }
     }
 
     /**
-    * Logs out the specified user from the system.
-    *
-    * @param usuario Contains the user's details necessary for logging out.
-    *                - id: The unique identifier of the user.
-    * @return Response indicating whether the logout process was successful.
-    */
+     * Logs out the specified user from the system.
+     *
+     * @param usuario Contains the user's details necessary for logging out.
+     *                - id: The unique identifier of the user.
+     * @return Response indicating whether the logout process was successful.
+     */
     @PostMapping("/logout")
     public ResponseEntity<Response> logout(@RequestBody User usuario, HttpServletRequest request) {
         Timestamp dateNow = ToolHelper.castDateTime(ToolHelper.getCurrentDateTime());
-        //update sesion
+        // update sesion
         sessionService.setUpdateActivo(false, usuario, dateNow);
-		return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
     }
 }
-

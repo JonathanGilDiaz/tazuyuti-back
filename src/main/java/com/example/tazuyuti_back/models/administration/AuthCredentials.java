@@ -32,18 +32,18 @@ import lombok.ToString;
 @ToString
 public class AuthCredentials {
 
-    @Schema(description = SystemText.Login.ENTITY_CORREO)        // This annotation indicates that information for the swagger
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_CORREO_REQUERIDO)        // This annotation indicates that this parameter must not be null.
+    @Schema(description = SystemText.Login.ENTITY_CORREO)        
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_CORREO_REQUERIDO)        
     @NotBlank(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_CORREO_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     private String usuario;
     
-    @Schema(description = SystemText.Login.ENTITY_PASSWORD)        // This annotation indicates that information for the swagger
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_PASSWORD_REQUERIDO)        // This annotation indicates that this parameter must not be null.
+    @Schema(description = SystemText.Login.ENTITY_PASSWORD)        
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_PASSWORD_REQUERIDO)        
     @NotBlank(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_PASSWORD_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     private String password;
     
-    @Schema(description = SystemText.Login.ENTITY_RECAPCHAT_RESPONSE)        // This annotation indicates that information for the swagger
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_RECAPCHAT_RESPONSE_REQUERIDO)        // This annotation indicates that this parameter must not be null.
+    @Schema(description = SystemText.Login.ENTITY_RECAPCHAT_RESPONSE)        
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_RECAPCHAT_RESPONSE_REQUERIDO)        
     @NotBlank(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_RECAPCHAT_RESPONSE_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     private String recaptchaResponse;
 

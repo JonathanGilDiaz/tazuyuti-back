@@ -58,32 +58,32 @@ public class Producto {
     @Column(name = "id")
     private Integer id;
 
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El nombre del producto es requerido")         // This annotation indicates that this parameter must not be null.
-    @Schema(description = "Nombre del producto", example = "Gatorade fresa")        // This annotation indicates that information for the swagger
-    @Column(name = "nombre", nullable = false)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El nombre del producto es requerido")         
+    @Schema(description = "Nombre del producto", example = "Gatorade fresa")        
+    @Column(name = "nombre", nullable = false)         
     private String nombre;
 
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El codigo del producto es requerido")         // This annotation indicates that this parameter must not be null.
-    @Schema(description = "Código del producto", example = "GDFGKJDFG")        // This annotation indicates that information for the swagger
-    @Column(name = "codigo", nullable = false)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El codigo del producto es requerido")         
+    @Schema(description = "Código del producto", example = "GDFGKJDFG")        
+    @Column(name = "codigo", nullable = false)         
     private String codigo;
 
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "La unidad del producto es requerido")         // This annotation indicates that this parameter must not be null.
-    @Schema(description = "Unidad del producto", example = "Pieza/Granel")        // This annotation indicates that information for the swagger
-    @Column(name = "unidad", nullable = false)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "La unidad del producto es requerido")         
+    @Schema(description = "Unidad del producto", example = "Pieza/Granel")        
+    @Column(name = "unidad", nullable = false)         
     private String unidad;
 
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El Costo del producto es requerido")         // This annotation indicates that this parameter must not be null.
-    @Schema(description = "Costo del producto", example = "10.50")        // This annotation indicates that information for the swagger
-    @Column(name = "costo", nullable = false)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El Costo del producto es requerido")         
+    @Schema(description = "Costo del producto", example = "10.50")        
+    @Column(name = "costo", nullable = false)         
     private double costo;
 
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El precio del producto es requerido")         // This annotation indicates that this parameter must not be null.
-    @Schema(description = "Precio del producto", example = "10.50")        // This annotation indicates that information for the swagger
-    @Column(name = "precio", nullable = false)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @NotNull(groups = {onCreate.class, onUpdate.class}, message = "El precio del producto es requerido")         
+    @Schema(description = "Precio del producto", example = "10.50")        
+    @Column(name = "precio", nullable = false)         
     private double precio;
 
-    @Column(name = "estado", nullable = false)         // This annotation indicates that Associates the attribute with a database column and indicates the validations it must have in order to be assigned a value.
+    @Column(name = "estado", nullable = false)         
     private boolean estado;
     
     @CreationTimestamp

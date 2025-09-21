@@ -543,11 +543,12 @@ public class BoletoServiceImpl implements BoletoService {
                     .mapToDouble(Boleto::getTotal)
                     .sum();
 
-            String nombreSucursal = bitacora.getUsuario().getSucursal().getNombre();
+            User usuarioActual = userRepository.findById(bitacora.getUsuario().getId()).get();
+            String nombreSucursal = usuarioActual.getSucursal().getNombre();
             String letraSucursal = nombreSucursal.substring(0, 1).toUpperCase();
             long conteo = /* necesitas un repository para bitácora */
-                    bitacoraRepository.countByUsuario_Sucursal_Id(bitacora.getUsuario().getSucursal().getId());
-            String folio = "C" + letraSucursal + (conteo + 1);
+                    bitacoraRepository.countByUsuario_Sucursal_Id(usuarioActual.getSucursal().getId());
+            String folio = "BI" + letraSucursal + (conteo + 1);
 
             // 🔹 4. Completar la bitácora
             bitacora.setTotal(total);
@@ -587,12 +588,19 @@ public class BoletoServiceImpl implements BoletoService {
             List<Paquete> paquetesSiguen = detalleRutasViajePaquetesActivos.stream()
                     .map(DetalleRutasViajePaquete::getPaquete)
                     .collect(Collectors.toList());
+
+            Bitacora bitacora = new Bitacora();
+            Optional<Bitacora> bitacoraOp = bitacoraRepository.findByDetalleRuta_Id(detalleRuta.getId());
+            if(bitacoraOp.isPresent()){
+                bitacora = bitacoraOp.get();
+            }
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("detalleRuta", detalleRuta);
             responseData.put("boletosEnviados", boletos);
             responseData.put("paquetesEnviados", paquetes);
             responseData.put("boletosSiguen", boletosSiguen);
             responseData.put("paquetesSiguen", paquetesSiguen);
+            responseData.put("bitacora", bitacora);
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new Response(true, SystemText.General.REGISTRO_ENCONTRADO, responseData));

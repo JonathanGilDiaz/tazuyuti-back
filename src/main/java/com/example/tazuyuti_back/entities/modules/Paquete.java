@@ -48,7 +48,7 @@ import lombok.ToString;
 @Table(schema = "modulos", name = "paquete")
 public class Paquete {
 
-    @Id // This annotation indicates that this field is the primary key of the entity.
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // This annotation indicates that the primary key value is
     @Schema(description = SystemText.User.ENTITY_ID, example = "10") // This annotation indicates that information for
     @NotNull(groups = onUpdate.class, message = SystemText.User.ENTITY_USUARIO_ID_REQUERIDO) // This annotation
