@@ -20,18 +20,10 @@ public interface DetalleRutaRepository
     @Query("SELECT COUNT(DISTINCT d.fecha) FROM DetalleRuta d WHERE d.ruta.id = :rutaId AND d.fecha >= :hoy")
     int countDistinctFechas(@Param("rutaId") int rutaId, @Param("hoy") LocalDate hoy);
 
-    List<DetalleRuta> findByRutaIdAndEstadoTrueOrderByFechaAscIdAsc(int rutaId);
+    @Query("SELECT d FROM DetalleRuta d WHERE d.ruta.id = :rutaId AND d.estado = 'Activo' ORDER BY d.fecha ASC, d.id ASC")
+    List<DetalleRuta> findByRutaIdAndEstadoActivoOrderByFechaAscIdAsc(@Param("rutaId") int rutaId);
 
     boolean existsByRutaIdAndFecha(int rutaId, LocalDate fecha);
 
-    List<DetalleRuta> findByFechaAndEstadoTrue(LocalDate hoy);
-
     List<DetalleRuta> findByEstadoAndFechaAndSalida_Id(String estado, LocalDate fecha, int salidaId);
-
-    List<DetalleRuta> findByRutaIdAndFechaAndEstadoTrue(int rutaId, LocalDate fecha);
-
-    List<DetalleRuta> findByRutaIdAndFechaAndEstadoTrueOrderBySalidaHoraAsc(int rutaId, LocalDate fecha);
-
-    List<DetalleRuta> findByRutaIdAndEstadoTrue(Integer rutaId);
-
 }

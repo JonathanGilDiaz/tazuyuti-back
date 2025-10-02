@@ -610,4 +610,22 @@ public class BoletoServiceImpl implements BoletoService {
         }
     }
 
+     @SuppressWarnings("unchecked")
+    @Override
+    public ResponseEntity<Response> indexBitacorasChofer(int idUsuario, Pagination requestT) {
+        User usuario = userRepository.findById(idUsuario).get();
+        int sucursalId = usuario.getSucursal().getId();
+        Map<String, Object> data = Utils.getSpecificationAndPageable(requestT, DetalleRuta.class);
+        Specification<DetalleRuta> specs = (Specification<DetalleRuta>) data.get("specification");
+        Specification<DetalleRuta> filtroSucursal = (root, query, cb) -> cb
+                .equal(root.get("ruta").get("unidad").get("usuario").get("id"), sucursalId);
+        Specification<DetalleRuta> finalSpecs = specs == null ? filtroSucursal : specs.and(filtroSucursal);
+        Page<DetalleRuta> list = detalleRutaRepository.findAll(finalSpecs, (Pageable) data.get("pageable"));
+        if (list.hasContent()) {
+            return ResponseEntity.ok(new Response(true, SystemText.General.PROCESO_EXITOSO, list));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
+        }
+    }
 }

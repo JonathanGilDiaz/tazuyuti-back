@@ -280,7 +280,7 @@ public class RutasServiceImpl implements RutaService {
                 int capAnterior = unidadAnterior.getTipoCamioneta().getCapacidad();
 
                 List<DetalleRuta> detallesViejos = detalleRutaRepository
-                                .findByRutaIdAndEstadoTrueOrderByFechaAscIdAsc(actual.getId());
+                                .findByRutaIdAndEstadoActivoOrderByFechaAscIdAsc(actual.getId());
 
                 // === Validación de capacidad con los detalles existentes ===
                 if (capNueva < capAnterior) {

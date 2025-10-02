@@ -134,4 +134,32 @@ public class TaquillaController {
         }
     }
 
+      @PostMapping(value = "/taquilla/{idUsuario}/indexBitacorasChofer", consumes = { "application/xml", "application/json" })
+    public ResponseEntity<Response> indexBitacorasChofer(
+            @PathVariable int idUsuario,
+            @Validated @RequestBody Pagination request) {
+        try {
+            if (request.getPage() <= 0 || request.getSize() <= 0 || request.getSort().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new Response(false, SystemText.General.FALTA_INFORMACION, null));
+            }
+
+            String message = Utils.validateFilteringInformation(
+                    SystemText.Taquilla.OPCIONES_VALIDAS_PAGINACION_BITACORA, request.getSort(),
+                    request.getFilters());
+            if (message.equals("")) {
+                return service.indexBitacorasChofer(idUsuario, request);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, message, null));
+            }
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "Solicitud no encontrada", null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Response(false, "Error interno en el servidor", null));
+        }
+    }
+
 }

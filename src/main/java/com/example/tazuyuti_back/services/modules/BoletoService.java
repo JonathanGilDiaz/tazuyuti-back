@@ -36,4 +36,5 @@ public interface BoletoService {
 
     ResponseEntity<Response> detailDetalleRuta(int id);
 
+    ResponseEntity<Response> indexBitacorasChofer(int user, Pagination request);
 }
