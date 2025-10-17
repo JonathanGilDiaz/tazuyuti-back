@@ -31,8 +31,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @ToString
-@Table(schema = "modulos", name = "detalle_equipaje_boleto")
-public class DetalleEquipajeBoleto {
+@Table(schema = "modulos", name = "detalle_orden_compra")
+public class DetalleOrdenCompra {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,19 +43,19 @@ public class DetalleEquipajeBoleto {
 
     @JsonBackReference
     @ManyToOne(optional = false) 
-    @JoinColumn(name = "boleto_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "orden_compra_id", referencedColumnName = "id", nullable = false)
     @NotNull(groups = { onCreate.class, onUpdate.class }, message = "La venta es requerida")
-    private Boleto boleto;
+    private OrdenCompra orden;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "precio_equipaje_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "producto_id", referencedColumnName = "id", nullable = false)
     @NotNull(groups = { onCreate.class, onUpdate.class }, message = "El producto es requerido")
-    private PrecioEquipaje precioEquipaje;
+    private Producto producto;
 
     @Column(name = "cantidad", nullable = true)
-    private Integer cantidad;
+    private double cantidad;
 
-        @Column(name = "precio", nullable = true)
+    @Column(name = "precio", nullable = true)
     private double precio;
 
     @Column(name = "subtotal", nullable = true)

@@ -17,11 +17,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.entities.modules.Producto;
 import com.example.tazuyuti_back.helpers.SystemText;
+import com.example.tazuyuti_back.helpers.ToolHelper;
 import com.example.tazuyuti_back.helpers.Utils;
 import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
+import com.example.tazuyuti_back.repositories.administration.UserRepository;
 import com.example.tazuyuti_back.repositories.modules.ProductoRepository;
 import com.example.tazuyuti_back.services.modules.ProductoService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +36,9 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Autowired
     private ProductoRepository productoRepository;
+
+    @Autowired
+    private UserRepository usuarioRepo;
 
     @Override
     @Transactional
@@ -78,9 +85,15 @@ public class ProductoServiceImpl implements ProductoService {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new Response(false, SystemText.Producto.PRODUCTO_REPETIDO, null));
         }
+        Producto productoBD = productoOp.get();
         producto.setFechaCreacion(productoOp.get().getFechaCreacion());
         producto.setFechaActualizacion(Timestamp.valueOf(LocalDateTime.now()));
         producto.setEstado(true);
+        User userAuthenticated = usuarioRepo.findFirstByUsuarioAndActivoTrue(ToolHelper.getUserNameAuthenticate())
+                .get();
+        if (userAuthenticated.getRol().getId() != 1) {
+            producto.setCantidad(productoBD.getCantidad());
+        }
         productoRepository.save(producto);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));

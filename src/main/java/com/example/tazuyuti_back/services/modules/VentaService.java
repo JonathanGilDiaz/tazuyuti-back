@@ -7,6 +7,8 @@ package com.example.tazuyuti_back.services.modules;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+
+import com.example.tazuyuti_back.entities.modules.OrdenCompra;
 import com.example.tazuyuti_back.entities.modules.Venta;
 import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
@@ -20,4 +22,10 @@ public interface VentaService {
     ResponseEntity<Response> detail(int id);
 
     ResponseEntity<Response> ticket(int id);
+
+    ResponseEntity<Response> ordenSave(OrdenCompra venta, HttpServletRequest request);
+    
+    ResponseEntity<Response> ordenIndex(int user, Pagination request);
+    
+    ResponseEntity<Response> ordenDetail(int id);
 }    

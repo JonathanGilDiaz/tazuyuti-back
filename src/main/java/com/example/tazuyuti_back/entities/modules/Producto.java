@@ -98,4 +98,7 @@ public class Producto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Timestamp fechaActualizacion;
 
+    @Column(name = "cantidad")         
+    private double cantidad;
+
 }

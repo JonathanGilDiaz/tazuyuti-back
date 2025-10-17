@@ -265,7 +265,7 @@ public class SystemText {
     public static class Producto {
         public static final String ENTITY_ID = "Identificador único del producto";
         public static final String ENTITY_ID_REQUERIDO = "Identificador único del producto es requerido";
-        public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,fechaActualizacion,estado,precio,costo,unidad,codigo,nombre";
+        public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,fechaActualizacion,estado,precio,costo,unidad,codigo,nombre,cantidad";
         public static final String PRODUCTO_REPETIDO = "Ya se cuenta con un producto con el mismo nombre o codigo";
     }
 
@@ -283,6 +283,7 @@ public class SystemText {
 
     public static class Venta {
         public static final String OPCIONES_VALIDAS_PAGINACION = "id,fechaCreacion,estado,formaPago,total,folio,usuario.nombre";
+        public static final String OPCIONES_VALIDAS_PAGINACION_ORDEB_COMPRA = "id,fechaCreacion,total,usuario.nombre";
     }
 
     public static class Paquete {

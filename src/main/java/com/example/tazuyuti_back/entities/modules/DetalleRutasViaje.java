@@ -42,7 +42,7 @@ public class DetalleRutasViaje {
     private int id;
 
     @JsonBackReference
-    @ManyToOne(optional = false) // 🔹 Un detalle pertenece a UNA venta
+    @ManyToOne(optional = false) 
     @JoinColumn(name = "boleto_id", referencedColumnName = "id", nullable = false)
     @NotNull(groups = { onCreate.class, onUpdate.class }, message = "La venta es requerida")
     private Boleto boleto;
