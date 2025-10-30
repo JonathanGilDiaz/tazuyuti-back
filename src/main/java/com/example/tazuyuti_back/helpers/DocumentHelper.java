@@ -108,7 +108,7 @@ public class DocumentHelper {
             PdfDocument pdfDoc = new PdfDocument(writer);
             pdfDoc.setDefaultPageSize(new PageSize(226, 800));
             Document document = new Document(pdfDoc);
-            document.setMargins(5, 5, 5, 5);
+            document.setMargins(5, 15, 5, 15);
             List<IElement> elements = HtmlConverter.convertToElements(html);
             for (IElement element : elements) {
                 document.add((IBlockElement) element);
@@ -259,7 +259,7 @@ public class DocumentHelper {
             PdfDocument pdfDoc = new PdfDocument(writer);
             pdfDoc.setDefaultPageSize(new PageSize(226, 800)); // ~80mm de ancho
             Document document = new Document(pdfDoc);
-            document.setMargins(5, 5, 5, 5);
+            document.setMargins(5, 15, 5, 15);
 
             List<IElement> elements = HtmlConverter.convertToElements(html.toString());
             for (IElement element : elements) {
@@ -305,7 +305,7 @@ public class DocumentHelper {
             PdfDocument pdfDoc = new PdfDocument(writer);
             pdfDoc.setDefaultPageSize(new PageSize(226, 600)); // 80mm de ancho aprox
             Document document = new Document(pdfDoc);
-            document.setMargins(5, 5, 5, 5);
+            document.setMargins(5, 15, 5, 15);
 
             int contador = 1;
             for (DetallePaquete det : paquete.getDetallePaquete()) {
@@ -510,7 +510,7 @@ public class DocumentHelper {
             PdfDocument pdfDoc = new PdfDocument(writer);
             pdfDoc.setDefaultPageSize(new PageSize(226, 600));
             Document document = new Document(pdfDoc);
-            document.setMargins(5, 5, 5, 5);
+            document.setMargins(5, 15, 5, 15);
 
             List<IElement> elements = HtmlConverter.convertToElements(html.toString());
             for (IElement element : elements) {
