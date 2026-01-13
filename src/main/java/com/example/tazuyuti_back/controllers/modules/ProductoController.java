@@ -40,7 +40,7 @@ public class ProductoController {
             HttpServletRequest request) {
         return service.save(producto, request);
     }
-   
+
     @PostMapping(value = "/producto/index", consumes = { "application/xml", "application/json" })
     public ResponseEntity<Response> index(
             @Validated @RequestBody Pagination request) {
@@ -80,7 +80,6 @@ public class ProductoController {
         return service.delete(id, request);
     }
 
-   
     @GetMapping(value = "/producto/{id}/detail")
     public ResponseEntity<Response> detail(@PathVariable(name = "id", required = true) int id) {
         return service.detail(id);
@@ -89,5 +88,19 @@ public class ProductoController {
     @GetMapping(value = "/producto/getAll")
     public ResponseEntity<Response> catalogs() {
         return service.getAll();
+    }
+
+    @PostMapping(value = "/producto/{idUsuario}/excel", consumes = { "application/xml", "application/json" })
+    public ResponseEntity<Response> excel(@PathVariable("idUsuario") int idUsuario) {
+        try {
+            return service.excel(idUsuario);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "Solicitud no encontrada", null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Response(false, "Error interno en el servidor", null));
+        }
     }
 }

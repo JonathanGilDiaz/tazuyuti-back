@@ -6,15 +6,24 @@
 package com.example.tazuyuti_back.helpers;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Font;
+import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.entities.modules.Boleto;
 import com.example.tazuyuti_back.entities.modules.DetalleBoleto;
 import com.example.tazuyuti_back.entities.modules.DetalleEquipajeBoleto;
@@ -27,8 +36,22 @@ import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import java.util.Set;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.IElement;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.util.Collections;
+import java.util.Date;
 
 @Service
 public class DocumentHelper {
@@ -38,6 +61,9 @@ public class DocumentHelper {
 
     @Value("${files.upload-directory-imagenes:uploads/documentos/}")
     private String directoryImages;
+
+    @Value("${files.upload-directory-reporteExcel}")
+    private String directoryExcel;
 
     public Map<String, Object> createTicketVenta(Venta venta) {
         Map<String, Object> response = new HashMap<>();
@@ -526,4 +552,144 @@ public class DocumentHelper {
         return response;
     }
 
+    public void ReporteExcels(String filePath, String titulo, User usuario,
+            List<Map.Entry<String, Boolean>> encabezados,
+            List<List<Object>> datos) throws IOException {
+        String fileUrl = directoryExcel + "reporteBase.xlsx";
+        File file = new File(fileUrl);
+        if (!file.exists()) {
+            throw new FileNotFoundException("El archivo no existe en la ruta: " + fileUrl);
+        }
+        try (FileInputStream fis = new FileInputStream(file);
+                Workbook workbook = new XSSFWorkbook(fis)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Row rowTitulo = sheet.getRow(2);
+            if (rowTitulo == null)
+                rowTitulo = sheet.createRow(2);
+            Cell cellTitulo = rowTitulo.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            cellTitulo.setCellValue(safeValue(titulo));
+            Row rowUsuario = sheet.getRow(4);
+            if (rowUsuario == null)
+                rowUsuario = sheet.createRow(4);
+            Cell cellUsuario = rowUsuario.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            cellUsuario.setCellValue(usuario.getNombre());
+            Cell cellFecha = rowUsuario.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            String fechaActual = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+            cellFecha.setCellValue(fechaActual);
+            Row filaEncabezados = sheet.getRow(6);
+            if (filaEncabezados == null)
+                filaEncabezados = sheet.createRow(6);
+            CellStyle estiloEncabezado = workbook.createCellStyle();
+            Font font = workbook.createFont();
+            font.setBold(true);
+            estiloEncabezado.setFont(font);
+            estiloEncabezado.setAlignment(HorizontalAlignment.CENTER);
+            estiloEncabezado.setVerticalAlignment(VerticalAlignment.CENTER);
+            estiloEncabezado.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            estiloEncabezado.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            estiloEncabezado.setBorderTop(BorderStyle.THIN);
+            estiloEncabezado.setBorderBottom(BorderStyle.THIN);
+            estiloEncabezado.setBorderLeft(BorderStyle.THIN);
+            estiloEncabezado.setBorderRight(BorderStyle.THIN);
+            for (int i = 0; i < encabezados.size(); i++) {
+                Cell celda = filaEncabezados.createCell(i + 1);
+                celda.setCellValue(encabezados.get(i).getKey());
+                celda.setCellStyle(estiloEncabezado);
+            }
+            Set<Integer> columnasNumericasValidas = new HashSet<>();
+            for (int j = 0; j < encabezados.size(); j++) {
+                if (!encabezados.get(j).getValue())
+                    continue;
+                boolean todosNumericos = true;
+                for (List<Object> fila : datos) {
+                    if (j >= fila.size() || !(fila.get(j) instanceof Number)) {
+                        todosNumericos = false;
+                        break;
+                    }
+                }
+                if (todosNumericos)
+                    columnasNumericasValidas.add(j);
+            }
+            int rowStart = 7;
+            int colStart = 1;
+            Map<Integer, Double> sumas = new HashMap<>();
+            SimpleDateFormat formatterFecha = new SimpleDateFormat("dd/MM/yyyy");
+            for (int i = 0; i < datos.size(); i++) {
+                Row fila = sheet.getRow(rowStart + i);
+                if (fila == null)
+                    fila = sheet.createRow(rowStart + i);
+                List<Object> filaDatos = datos.get(i);
+                for (int j = 0; j < filaDatos.size(); j++) {
+                    Object valor = filaDatos.get(j);
+                    Cell celda = fila.createCell(colStart + j);
+                    if (valor instanceof Number) {
+                        double val = ((Number) valor).doubleValue();
+                        celda.setCellValue(val);
+                        celda.setCellStyle(createDecimalStyle(workbook));
+                        if (columnasNumericasValidas.contains(j)) {
+                            sumas.put(j, sumas.getOrDefault(j, 0.0) + val);
+                        }
+                    } else if (valor instanceof LocalDate) {
+                        LocalDate localDate = (LocalDate) valor;
+                        celda.setCellValue(formatterFecha.format(java.sql.Date.valueOf(localDate)));
+                        celda.setCellStyle(createBorderStyle(workbook));
+                    } else if (valor instanceof Date) {
+                        celda.setCellValue(formatterFecha.format((Date) valor));
+                        celda.setCellStyle(createBorderStyle(workbook));
+                    } else {
+                        celda.setCellValue(safeValue(valor != null ? valor.toString() : ""));
+                        celda.setCellStyle(createBorderStyle(workbook));
+                    }
+                }
+            }
+            if (!sumas.isEmpty()) {
+                int filaTotal = rowStart + datos.size();
+                Row fila = sheet.createRow(filaTotal);
+                int primerColumnaSuma = Collections.min(sumas.keySet());
+                Cell celdaTexto = fila.createCell(colStart + primerColumnaSuma - 1);
+                celdaTexto.setCellValue("Total:");
+                celdaTexto.setCellStyle(createBorderStyle(workbook));
+                for (Map.Entry<Integer, Double> entry : sumas.entrySet()) {
+                    Cell celdaSuma = fila.createCell(colStart + entry.getKey());
+                    celdaSuma.setCellValue(entry.getValue());
+                    celdaSuma.setCellStyle(createCurrencyStyle(workbook));
+                }
+            }
+            for (int i = 0; i < encabezados.size() + 2; i++) {
+                sheet.autoSizeColumn(i);
+                int currentWidth = sheet.getColumnWidth(i);
+                sheet.setColumnWidth(i, (int) (currentWidth * 1.15));
+            }
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                workbook.write(fos);
+            }
+        }
+    }
+
+    public String safeValue(String value) {
+        return value != null ? value.trim() : "";
+    }
+
+    private CellStyle createCurrencyStyle(Workbook workbook) {
+        CellStyle style = createBorderStyle(workbook);
+        DataFormat format = workbook.createDataFormat();
+        style.setDataFormat(format.getFormat("$#,##0.00"));
+        return style;
+    }
+
+    private CellStyle createBorderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        return style;
+    }
+
+    private CellStyle createDecimalStyle(Workbook workbook) {
+        CellStyle style = createBorderStyle(workbook);
+        DataFormat format = workbook.createDataFormat();
+        style.setDataFormat(format.getFormat("#0.00"));
+        return style;
+    }
 }

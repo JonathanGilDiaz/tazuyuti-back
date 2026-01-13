@@ -14,9 +14,9 @@ import com.example.tazuyuti_back.models.utilities.Response;
 public interface ProductoService {
 
     ResponseEntity<Response> save(Producto producto, HttpServletRequest request);
-    
+
     ResponseEntity<Response> index(Pagination request);
-    
+
     ResponseEntity<Response> detail(int id);
 
     ResponseEntity<Response> update(Producto producto, HttpServletRequest request);
@@ -25,4 +25,5 @@ public interface ProductoService {
 
     ResponseEntity<Response> getAll();
 
-}    
+    ResponseEntity<Response> excel(int idUsuario);
+}

@@ -5,21 +5,26 @@
  */
 package com.example.tazuyuti_back.services.modules.impl;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.entities.modules.Producto;
+import com.example.tazuyuti_back.helpers.DocumentHelper;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.ToolHelper;
 import com.example.tazuyuti_back.helpers.Utils;
@@ -39,6 +44,12 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Autowired
     private UserRepository usuarioRepo;
+
+    @Autowired
+    private DocumentHelper documentHelper;
+
+    @Value("${files.upload-directory-reporteExcel}")
+    private String directoryExcel;
 
     @Override
     @Transactional
@@ -136,7 +147,7 @@ public class ProductoServiceImpl implements ProductoService {
         }
     }
 
-     @Override
+    @Override
     public ResponseEntity<Response> getAll() {
         List<Producto> productos = productoRepository.findByEstadoTrue();
         if (!productos.isEmpty()) {
@@ -145,6 +156,56 @@ public class ProductoServiceImpl implements ProductoService {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new Response(false, SystemText.General.REGISTRO_ENCONTRADO, null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response> excel(int idUsuario) {
+        List<Producto> list = productoRepository.findByEstadoTrue();
+        if (!list.isEmpty()) {
+            String fileUrl = directoryExcel + "ReporteProductos.xlsx";
+            try {
+                File file = new File(fileUrl);
+                if (file.exists()) {
+                    file.delete();
+                }
+                List<Map.Entry<String, Boolean>> encabezados = new ArrayList<>();
+                encabezados.add(new AbstractMap.SimpleEntry<>("Código", false));
+                encabezados.add(new AbstractMap.SimpleEntry<>("Nombre", false));
+                encabezados.add(new AbstractMap.SimpleEntry<>("Unidad", false));
+                encabezados.add(new AbstractMap.SimpleEntry<>("Costo de compra", false));
+                encabezados.add(new AbstractMap.SimpleEntry<>("Precio de venta", false));
+                encabezados.add(new AbstractMap.SimpleEntry<>("Existencia", false));
+                List<List<Object>> datos = list.stream()
+                        .map(dato -> {
+                            List<Object> fila = new ArrayList<>();
+                            fila.add(dato.getCodigo());
+                            fila.add(dato.getNombre());
+                            fila.add(dato.getUnidad());
+                            fila.add(dato.getCosto());
+                            fila.add(dato.getPrecio());
+                            fila.add(dato.getCantidad());
+                            return fila;
+                        })
+                        .collect(Collectors.toList());
+
+                Optional<User> userOp = usuarioRepo.findById(idUsuario);
+                if (!userOp.isPresent()) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
+                }
+                documentHelper.ReporteExcels(fileUrl, "Productos", userOp.get(), encabezados, datos);
+
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new Response(true, SystemText.General.REGISTRO_ENCONTRADO, Utils.encodeFileToBase64(fileUrl)));
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new Response(false, e.getMessage(), null));
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
         }
     }
 }
