@@ -6,9 +6,12 @@
 package com.example.tazuyuti_back.controllers.administration;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +19,7 @@ import com.example.tazuyuti_back.configuration.JwtService;
 import com.example.tazuyuti_back.entities.administration.Menu;
 import com.example.tazuyuti_back.entities.administration.Session;
 import com.example.tazuyuti_back.entities.administration.User;
+import com.example.tazuyuti_back.entities.modules.Corte;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.ToolHelper;
 import com.example.tazuyuti_back.models.administration.AuthCredentials;
@@ -98,17 +102,27 @@ public class AuthController {
             if (authentication.getPrincipal() != null) {
                 if (usuarioDetail.getUsuario().getActivo()) {
                     User usuario = usuarioDetail.getUsuario();
-                    if (usuario.getRol().getId() != 5) {
-                        boolean tieneCorteAbierto = corteRepository.findFirstByUsuarioAndEstado(usuario, "Abierto")
-                                .isPresent();
-
-                        if (!tieneCorteAbierto) {
+                    int rolUsuario = usuario.getRol().getId();
+                    if (rolUsuario != 5) {
+                        Optional<Corte> corteOpt = corteRepository.findFirstByUsuarioAndEstado(usuario, "Abierto");
+                        if (corteOpt.isEmpty()) {
                             HashMap<String, Object> responseError = new HashMap<>();
                             responseError.put("usuarioId", usuario.getId());
                             return ResponseEntity
                                     .status(HttpStatus.LOCKED)
-                                    .body(new Response(false, "Falta crear un corte para iniciar sesión",
+                                    .body(new Response(
+                                            false,
+                                            "Falta crear un corte para iniciar sesión",
                                             responseError));
+                        }
+                        Corte corte = corteOpt.get();
+                        LocalDate fechaCorte = corte.getInicio()
+                                .toLocalDateTime()
+                                .toLocalDate();
+
+                        LocalDate fechaHoy = LocalDate.now();
+                        if (fechaCorte.isBefore(fechaHoy)) {
+                            rolUsuario = 6;
                         }
                     }
                     Timestamp dateNow = ToolHelper.castDateTime(ToolHelper.getCurrentDateTime());
@@ -123,17 +137,17 @@ public class AuthController {
                             .fecha_fin(endDate).build();
                     // register session
                     sessionService.save(session);
-                    List<Menu> menus = menuService.findByRolIdAndOpcionNivel(usuario.getRol().getId(), 1);
+                    List<Menu> menus = menuService.findByRolIdAndOpcionNivel(rolUsuario, 1);
                     List<HashMap<String, Object>> opcionesMenu = new ArrayList<>();
                     for (Menu menu : menus) {
 
-                        List<Menu> subMenus = menuService.findByRolIdAndDepensAndOpcionNivel(usuario.getRol().getId(),
+                        List<Menu> subMenus = menuService.findByRolIdAndDepensAndOpcionNivel(rolUsuario,
                                 menu.getId(), 2);
 
                         List<HashMap<String, Object>> subMenusList = new ArrayList<>();
                         for (Menu subMenu : subMenus) {
                             List<Menu> subSubMenus = menuService.findByRolIdAndDepensAndOpcionNivel(
-                                    usuario.getRol().getId(), subMenu.getOpcion().getId(), 3);
+                                    rolUsuario, subMenu.getOpcion().getId(), 3);
                             HashMap<String, Object> subMenuMap = new HashMap<>(subMenu.toMap());
                             subMenuMap.put("subMenus", subSubMenus);
                             subMenusList.add(subMenuMap);

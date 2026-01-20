@@ -4,6 +4,7 @@
 package com.example.tazuyuti_back.controllers.modules;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,9 @@ import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.entities.modules.Bitacora;
 import com.example.tazuyuti_back.entities.modules.Boleto;
 import com.example.tazuyuti_back.entities.modules.Corte;
+import com.example.tazuyuti_back.entities.modules.DetalleVenta;
 import com.example.tazuyuti_back.entities.modules.Paquete;
+import com.example.tazuyuti_back.entities.modules.Producto;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.ToolHelper;
 import com.example.tazuyuti_back.helpers.Utils;
@@ -29,6 +32,7 @@ import com.example.tazuyuti_back.repositories.administration.UserRepository;
 import com.example.tazuyuti_back.repositories.modules.BitacoraRepository;
 import com.example.tazuyuti_back.repositories.modules.BoletoRepository;
 import com.example.tazuyuti_back.repositories.modules.CorteRepository;
+import com.example.tazuyuti_back.repositories.modules.DetalleVentaRepository;
 import com.example.tazuyuti_back.repositories.modules.PaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.VentaRepository;
 
@@ -57,6 +61,9 @@ public class CorteController {
 
         @Autowired
         private BitacoraRepository bitacoraRepository;
+
+        @Autowired
+        private DetalleVentaRepository detalleVentaRepository;
 
         @PostMapping("/crear")
         public ResponseEntity<Response> crearCorte(@RequestBody Corte request) {
@@ -105,10 +112,25 @@ public class CorteController {
 
                         Timestamp inicioCorte = corte.getInicio();
 
-                        // Obtener movimientos activos desde la fecha de inicio del corte
                         List<Venta> ventas = ventaRepository.findByUsuarioAndFechaCreacionAfterAndEstado(usuario,
                                         inicioCorte,
                                         true);
+
+                        List<DetalleVenta> detalles = detalleVentaRepository.findByVentas(ventas);
+                        Map<Producto, Double> resumenProductosMap = new HashMap<>();
+                        for (DetalleVenta dv : detalles) {
+                                Producto producto = dv.getProducto();
+                                double cantidad = dv.getCantidad();
+
+                                resumenProductosMap.merge(producto, cantidad, Double::sum);
+                        }
+                        List<Map<String, Object>> resumenProductos = new ArrayList<>();
+                        for (Map.Entry<Producto, Double> entry : resumenProductosMap.entrySet()) {
+                                Map<String, Object> item = new HashMap<>();
+                                item.put("producto", entry.getKey());
+                                item.put("cantidad", entry.getValue());
+                                resumenProductos.add(item);
+                        }
 
                         List<Boleto> boletos = boletoRepository.findByUsuarioAndFechaCreacionAfterAndEstado(usuario,
                                         inicioCorte,
@@ -116,11 +138,9 @@ public class CorteController {
                         List<Paquete> paquetes = paqueteRepository.findPaquetesActivosByUsuarioDesdeFecha(usuario,
                                         inicioCorte);
 
-                        // Obtener bitácoras
                         List<Bitacora> bitacoras = bitacoraRepository.findByUsuarioAndFechaCreacionAfter(usuario,
                                         inicioCorte);
 
-                        // Totales por forma de pago usando Streams
                         double totalEfectivo = ventas.stream()
                                         .mapToDouble(v -> v.getFormaPago().equals("01 Efectivo") ? v.getTotal() : 0)
                                         .sum() +
@@ -146,7 +166,6 @@ public class CorteController {
                                                                         ? p.getTotal()
                                                                         : 0)
                                                         .sum();
-
                         double totalTarjeta = ventas.stream()
                                         .mapToDouble(v -> v.getFormaPago().equals("04 Tarjeta") ? v.getTotal() : 0)
                                         .sum() +
@@ -159,19 +178,16 @@ public class CorteController {
                                                         .sum();
 
                         double totalGeneral = totalEfectivo + totalTransferencia + totalTarjeta;
-
-                        // Sumar monto de bitácoras (se resta al efectivo)
                         double totalBitacoras = bitacoras.stream().mapToDouble(Bitacora::getTotal).sum();
                         double saldoEnCaja = corte.getSaldoInicial() + totalEfectivo - totalBitacoras;
 
-                        // Armar respuesta
                         Map<String, Object> resultado = new HashMap<>();
                         resultado.put("corte", corte);
                         resultado.put("ventas", ventas);
                         resultado.put("boletos", boletos);
                         resultado.put("paquetes", paquetes);
                         resultado.put("bitacoras", bitacoras);
-
+                        resultado.put("resumenProductos", resumenProductos);
                         Map<String, Double> totales = new HashMap<>();
                         totales.put("efectivo", totalEfectivo);
                         totales.put("transferencia", totalTransferencia);
@@ -179,9 +195,7 @@ public class CorteController {
                         totales.put("total", totalGeneral);
                         totales.put("totalBitacoras", totalBitacoras);
                         totales.put("saldoCaja", saldoEnCaja);
-
                         resultado.put("totales", totales);
-
                         return ResponseEntity
                                         .ok(new Response(true, "Corte y movimientos activos obtenidos", resultado));
 
@@ -269,9 +283,25 @@ public class CorteController {
                         Timestamp inicioCorte = corte.getInicio();
                         Timestamp cierreCorte = corte.getCierre();
 
-                        // Movimientos entre inicio y cierre
                         List<Venta> ventas = ventaRepository.findByUsuarioAndFechaCreacionBetweenAndEstado(
                                         usuario, inicioCorte, cierreCorte, true);
+                        List<DetalleVenta> detalles = detalleVentaRepository.findByVentas(ventas);
+
+                        Map<Producto, Double> resumenProductosMap = new HashMap<>();
+
+                        for (DetalleVenta dv : detalles) {
+                                Producto producto = dv.getProducto();
+                                double cantidad = dv.getCantidad();
+                                resumenProductosMap.merge(producto, cantidad, Double::sum);
+                        }
+
+                        List<Map<String, Object>> resumenProductos = new ArrayList<>();
+                        for (Map.Entry<Producto, Double> entry : resumenProductosMap.entrySet()) {
+                                Map<String, Object> item = new HashMap<>();
+                                item.put("producto", entry.getKey());
+                                item.put("cantidad", entry.getValue());
+                                resumenProductos.add(item);
+                        }
 
                         List<Boleto> boletos = boletoRepository.findByUsuarioAndFechaCreacionBetweenAndEstado(
                                         usuario, inicioCorte, cierreCorte, "Activo");
@@ -282,13 +312,13 @@ public class CorteController {
                         List<Bitacora> bitacoras = bitacoraRepository.findByUsuarioAndFechaCreacionBetween(
                                         usuario, inicioCorte, cierreCorte);
 
-                        // Respuesta
                         Map<String, Object> resultado = new HashMap<>();
                         resultado.put("corte", corte);
                         resultado.put("ventas", ventas);
                         resultado.put("boletos", boletos);
                         resultado.put("paquetes", paquetes);
                         resultado.put("bitacoras", bitacoras);
+                        resultado.put("resumenProductos", resumenProductos);
 
                         return ResponseEntity.ok(new Response(true, "Detalle del corte cerrado obtenido", resultado));
                 } catch (Exception e) {
