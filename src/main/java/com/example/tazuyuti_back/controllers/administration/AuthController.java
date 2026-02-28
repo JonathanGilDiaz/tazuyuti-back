@@ -89,11 +89,12 @@ public class AuthController {
     public ResponseEntity<Response> authenticateUser(
             @RequestBody @Validated(onCreate.class) AuthCredentials authCredentials, HttpServletRequest request) {
         try {
-            if (!recaptchaService.verifyRecaptcha(authCredentials.getRecaptchaResponse(), false)) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(new Response(false, SystemText.Login.VALIDACION_CAPTCHA_FALLO, null));
+            if (authCredentials.getLoginPostCorte() == null || !authCredentials.getLoginPostCorte()) {
+                if (!recaptchaService.verifyRecaptcha(authCredentials.getRecaptchaResponse(), false)) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body(new Response(false, SystemText.Login.VALIDACION_CAPTCHA_FALLO, null));
+                }
             }
-
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     authCredentials.getUsuario(), authCredentials.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -106,14 +107,14 @@ public class AuthController {
                     if (rolUsuario != 5) {
                         Optional<Corte> corteOpt = corteRepository.findFirstByUsuarioAndEstado(usuario, "Abierto");
                         if (corteOpt.isEmpty()) {
+
                             HashMap<String, Object> responseError = new HashMap<>();
                             responseError.put("usuarioId", usuario.getId());
-                            return ResponseEntity
-                                    .status(HttpStatus.LOCKED)
-                                    .body(new Response(
-                                            false,
-                                            "Falta crear un corte para iniciar sesión",
-                                            responseError));
+                            responseError.put("requiereCorte", true);
+
+                            return ResponseEntity.status(HttpStatus.OK)
+                                    .body(new Response(true, "Requiere crear corte", responseError));
+
                         }
                         Corte corte = corteOpt.get();
                         LocalDate fechaCorte = corte.getInicio()
@@ -178,7 +179,9 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body(new Response(false, SystemText.Login.CREDENCIALES_INVALIDAS, null));
             }
-        } catch (AuthenticationException ex) {
+        } catch (
+
+        AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(false, ex.getMessage(), null));
         }
     }

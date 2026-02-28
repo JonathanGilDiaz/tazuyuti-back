@@ -79,7 +79,12 @@ public class VentaController {
         return service.ticket(id);
     }
 
-      @PostMapping(value = "/ordenCompra/save", consumes = { "application/json" })
+    @GetMapping(value = "/venta/{id}/ticketFactura/{idCliente}")
+    public ResponseEntity<Response> ticket(@PathVariable(name = "id", required = true) int id,@PathVariable(name = "idCliente", required = true) int idCliente) {
+        return service.ticketFactura(id,idCliente);
+    }
+
+    @PostMapping(value = "/ordenCompra/save", consumes = { "application/json" })
     public ResponseEntity<Response> ordenSave(
             @Validated(onCreate.class) @RequestBody OrdenCompra venta,
             HttpServletRequest request) {

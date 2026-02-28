@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.tazuyuti_back.entities.administration.User;
+import com.example.tazuyuti_back.entities.modules.Cliente;
 import com.example.tazuyuti_back.entities.modules.DetalleOrdenCompra;
 import com.example.tazuyuti_back.entities.modules.DetalleVenta;
 import com.example.tazuyuti_back.entities.modules.OrdenCompra;
@@ -29,6 +30,7 @@ import com.example.tazuyuti_back.helpers.Utils;
 import com.example.tazuyuti_back.models.utilities.Pagination;
 import com.example.tazuyuti_back.models.utilities.Response;
 import com.example.tazuyuti_back.repositories.administration.UserRepository;
+import com.example.tazuyuti_back.repositories.modules.ClienteRepository;
 import com.example.tazuyuti_back.repositories.modules.OrdenCompraRepository;
 import com.example.tazuyuti_back.repositories.modules.ProductoRepository;
 import com.example.tazuyuti_back.repositories.modules.VentaRepository;
@@ -54,6 +56,9 @@ public class VentaServiceImpl implements VentaService {
 
     @Autowired
     private OrdenCompraRepository ordenCompraRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     @Override
     @Transactional
@@ -138,6 +143,27 @@ public class VentaServiceImpl implements VentaService {
         Optional<Venta> ventaOp = ventaRepository.findById(id);
         if (ventaOp.isPresent()) {
             Map<String, Object> pdfData = documentHelper.createTicketVenta(ventaOp.get());
+            return ResponseEntity.ok(new Response(true, "Ticket generado", pdfData));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "Venta no encontrada", null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<Response> ticketFactura(int id, int idCliente) {
+        Optional<Cliente> clienteOp = clienteRepository.findById(idCliente);
+        if (!clienteOp.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "Cliente no encontrado", null));
+        }
+        Cliente cliente = clienteOp.get();
+        Optional<Venta> ventaOp = ventaRepository.findById(id);
+        if (ventaOp.isPresent()) {
+            Venta venta = ventaOp.get();
+            venta.setCliente(cliente);
+            venta = ventaRepository.save(venta);
+            Map<String, Object> pdfData = documentHelper.createTicketVentaFactura(venta);
             return ResponseEntity.ok(new Response(true, "Ticket generado", pdfData));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

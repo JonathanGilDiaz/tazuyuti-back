@@ -7,7 +7,6 @@ package com.example.tazuyuti_back.entities.modules;
 
 import java.sql.Timestamp;
 import java.util.List;
-
 import org.hibernate.annotations.CreationTimestamp;
 import com.example.tazuyuti_back.entities.administration.User;
 import com.example.tazuyuti_back.helpers.SystemText;
@@ -15,7 +14,6 @@ import com.example.tazuyuti_back.validator.onCreate;
 import com.example.tazuyuti_back.validator.onUpdate;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -79,7 +77,7 @@ public class Venta {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Timestamp fechaCreacion;
 
-    @Builder.Default                    // This annotation indicates that the attribute has a default value
+    @Builder.Default                    
     @Column(name = "estado", nullable = true)         
     private Boolean estado = true;
 
@@ -88,9 +86,13 @@ public class Venta {
     private String folio;
 
     @Valid
-    @Builder.Default                    // This annotation indicates that the attribute has a default value
+    @Builder.Default                    
     @JsonManagedReference             
     @Schema(description = "Arreglo de los detalles de la venta")                
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalleVentas = null;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", referencedColumnName = "id")                
+    private Cliente cliente;
 }

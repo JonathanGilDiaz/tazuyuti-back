@@ -43,8 +43,7 @@ public class AuthCredentials {
     private String password;
     
     @Schema(description = SystemText.Login.ENTITY_RECAPCHAT_RESPONSE)        
-    @NotNull(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_RECAPCHAT_RESPONSE_REQUERIDO)        
-    @NotBlank(groups = {onCreate.class, onUpdate.class}, message = SystemText.Login.ENTITY_RECAPCHAT_RESPONSE_REQUERIDO)       // This annotation indicates that this parameter must not be empty.
     private String recaptchaResponse;
 
+    private Boolean loginPostCorte = false;
 }

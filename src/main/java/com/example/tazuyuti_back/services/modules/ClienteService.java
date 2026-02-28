@@ -14,13 +14,14 @@ import com.example.tazuyuti_back.models.utilities.Response;
 public interface ClienteService {
 
     ResponseEntity<Response> save(Cliente cliente, HttpServletRequest request);
-    
+
     ResponseEntity<Response> index(Pagination request);
-    
+
     ResponseEntity<Response> detail(int id);
 
     ResponseEntity<Response> update(Cliente cliente, HttpServletRequest request);
 
     ResponseEntity<Response> delete(int id, HttpServletRequest request);
 
-}    
+    ResponseEntity<Response> getAll();
+}

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController; 
+import org.springframework.web.bind.annotation.RestController;
 import com.example.tazuyuti_back.entities.modules.Cliente;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.Utils;
@@ -40,7 +40,7 @@ public class ClienteController {
             HttpServletRequest request) {
         return service.save(cliente, request);
     }
-   
+
     @PostMapping(value = "/cliente/index", consumes = { "application/xml", "application/json" })
     public ResponseEntity<Response> index(
             @Validated @RequestBody Pagination request) {
@@ -83,5 +83,10 @@ public class ClienteController {
     @GetMapping(value = "/cliente/{id}/detail")
     public ResponseEntity<Response> detail(@PathVariable(name = "id", required = true) int id) {
         return service.detail(id);
+    }
+
+    @GetMapping(value = "/cliente/getAll")
+    public ResponseEntity<Response> catalogs() {
+        return service.getAll();
     }
 }

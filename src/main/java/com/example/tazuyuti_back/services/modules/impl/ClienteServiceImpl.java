@@ -43,6 +43,12 @@ public class ClienteServiceImpl implements ClienteService {
                 .body(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
     }
 
+    @Override
+    public ResponseEntity<Response> getAll() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response(true, SystemText.General.PROCESO_EXITOSO, clienteRepository.findByEstadoTrue()));
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public ResponseEntity<Response> index(Pagination requestT) {

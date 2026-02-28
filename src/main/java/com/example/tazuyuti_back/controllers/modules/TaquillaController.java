@@ -1,5 +1,6 @@
 package com.example.tazuyuti_back.controllers.modules;
 
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.tazuyuti_back.entities.modules.Bitacora;
 import com.example.tazuyuti_back.entities.modules.Boleto;
 import com.example.tazuyuti_back.helpers.SystemText;
@@ -134,7 +134,8 @@ public class TaquillaController {
         }
     }
 
-      @PostMapping(value = "/taquilla/{idUsuario}/indexBitacorasChofer", consumes = { "application/xml", "application/json" })
+    @PostMapping(value = "/taquilla/{idUsuario}/indexBitacorasChofer", consumes = { "application/xml",
+            "application/json" })
     public ResponseEntity<Response> indexBitacorasChofer(
             @PathVariable int idUsuario,
             @Validated @RequestBody Pagination request) {
@@ -162,4 +163,10 @@ public class TaquillaController {
         }
     }
 
+    @PostMapping(value = "taquilla/{id}/cambiar-hora")
+    public ResponseEntity<?> cambiarHora(
+            @PathVariable int id,
+            @RequestBody Map<String, String> body) {
+        return service.cambiarHora(id, body);
+    }
 }

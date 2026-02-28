@@ -38,4 +38,16 @@ public interface BoletoRepository extends JpaRepository<Boleto, Integer>, JpaSpe
                         Timestamp inicio,
                         Timestamp fin,
                         String estado);
+
+        @Query("""
+                            SELECT b FROM Boleto b
+                            WHERE b.detalleRutaSalida.ruta.unidad.id = :unidadId
+                            AND b.estado = 'Activo'
+                            AND b.formaPago = '03 Transferencia'
+                            AND b.fechaCreacion BETWEEN :fechaInicio AND :fechaFin
+                        """)
+        List<Boleto> findTransferenciasByUnidadAndFecha(
+                        @Param("unidadId") int unidadId,
+                        @Param("fechaInicio") Timestamp fechaInicio,
+                        @Param("fechaFin") Timestamp fechaFin);
 }

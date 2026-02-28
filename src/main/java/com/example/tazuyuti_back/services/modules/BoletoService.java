@@ -5,8 +5,8 @@
  */
 package com.example.tazuyuti_back.services.modules;
 
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
-
 import com.example.tazuyuti_back.entities.modules.Bitacora;
 import com.example.tazuyuti_back.entities.modules.Boleto;
 import com.example.tazuyuti_back.models.utilities.Pagination;
@@ -37,4 +37,6 @@ public interface BoletoService {
     ResponseEntity<Response> detailDetalleRuta(int id);
 
     ResponseEntity<Response> indexBitacorasChofer(int user, Pagination request);
+
+    ResponseEntity<Response> cambiarHora(int id, Map<String, String> body);
 }

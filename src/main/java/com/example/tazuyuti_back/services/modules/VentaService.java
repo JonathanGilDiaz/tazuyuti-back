@@ -16,16 +16,18 @@ import com.example.tazuyuti_back.models.utilities.Response;
 public interface VentaService {
 
     ResponseEntity<Response> save(Venta venta, HttpServletRequest request);
-    
+
     ResponseEntity<Response> index(int user, Pagination request);
-    
+
     ResponseEntity<Response> detail(int id);
 
     ResponseEntity<Response> ticket(int id);
 
+    ResponseEntity<Response> ticketFactura(int id,int idCliente);
+
     ResponseEntity<Response> ordenSave(OrdenCompra venta, HttpServletRequest request);
-    
+
     ResponseEntity<Response> ordenIndex(int user, Pagination request);
-    
+
     ResponseEntity<Response> ordenDetail(int id);
-}    
+}

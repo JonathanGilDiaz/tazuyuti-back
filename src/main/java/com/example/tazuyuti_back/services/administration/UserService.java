@@ -20,20 +20,21 @@ public interface UserService {
 
     Optional<User> findFirstByUsuarioAndActivoTrue(String usuario);
 
-	Optional<User> findFirstByUsuarioOrderByIdDesc(String usuario);
+    Optional<User> findFirstByUsuarioOrderByIdDesc(String usuario);
 
     ResponseEntity<Response> active(User usuario, HttpServletRequest request);
 
     ResponseEntity<Response> save(User usuario, HttpServletRequest request);
-    
+
     void activeUser(boolean activo, int id);
-    
+
     ResponseEntity<Response> index(Pagination request);
-    
+
     ResponseEntity<Response> catalogs();
-    
+
     ResponseEntity<Response> detail(int id);
 
     ResponseEntity<Response> update(User usuario, HttpServletRequest request);
 
-}    
+    ResponseEntity<Response> detailTransferencias(int id, String fechaInicio, String fechaFinal);
+}

@@ -73,7 +73,6 @@ public class CorteController {
                         User usuario = userRepository.findById(usuarioId)
                                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-                        // Validar que no tenga corte abierto
                         boolean tieneCorteAbierto = corteRepository.findFirstByUsuarioAndEstado(usuario, "Abierto")
                                         .isPresent();
                         if (tieneCorteAbierto) {
@@ -82,7 +81,6 @@ public class CorteController {
                                                                 null));
                         }
 
-                        // Crear corte
                         Corte corte = new Corte();
                         corte.setUsuario(usuario);
                         corte.setSaldoInicial(saldoInicial);

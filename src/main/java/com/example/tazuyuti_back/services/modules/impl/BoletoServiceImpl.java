@@ -7,6 +7,7 @@ package com.example.tazuyuti_back.services.modules.impl;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -591,7 +592,7 @@ public class BoletoServiceImpl implements BoletoService {
 
             Bitacora bitacora = new Bitacora();
             Optional<Bitacora> bitacoraOp = bitacoraRepository.findByDetalleRuta_Id(detalleRuta.getId());
-            if(bitacoraOp.isPresent()){
+            if (bitacoraOp.isPresent()) {
                 bitacora = bitacoraOp.get();
             }
             Map<String, Object> responseData = new HashMap<>();
@@ -610,7 +611,7 @@ public class BoletoServiceImpl implements BoletoService {
         }
     }
 
-     @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     @Override
     public ResponseEntity<Response> indexBitacorasChofer(int idUsuario, Pagination requestT) {
         User usuario = userRepository.findById(idUsuario).get();
@@ -628,4 +629,15 @@ public class BoletoServiceImpl implements BoletoService {
                     .body(new Response(false, SystemText.General.REGISTRO_NO_ENCONTRADO, null));
         }
     }
+
+    @Override
+    public ResponseEntity<Response> cambiarHora(int id, Map<String, String> body) {
+        String nuevaHora = body.get("hora");
+        DetalleRuta detalle = detalleRutaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No encontrado"));
+        detalle.setSalidaHora(LocalTime.parse(nuevaHora));
+        detalleRutaRepository.save(detalle);
+        return ResponseEntity.ok(new Response(true, SystemText.General.PROCESO_EXITOSO, null));
+    }
+
 }

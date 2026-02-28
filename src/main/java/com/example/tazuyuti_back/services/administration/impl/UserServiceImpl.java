@@ -6,8 +6,8 @@
 package com.example.tazuyuti_back.services.administration.impl;
 
 import org.springframework.stereotype.Service;
-
 import com.example.tazuyuti_back.entities.administration.User;
+import com.example.tazuyuti_back.entities.modules.Boleto;
 import com.example.tazuyuti_back.entities.modules.Unidad;
 import com.example.tazuyuti_back.helpers.SystemText;
 import com.example.tazuyuti_back.helpers.ToolHelper;
@@ -18,9 +18,9 @@ import com.example.tazuyuti_back.repositories.administration.SessionAttemptRepos
 import com.example.tazuyuti_back.repositories.administration.UserRepository;
 import com.example.tazuyuti_back.repositories.catalogs.RoleRepository;
 import com.example.tazuyuti_back.repositories.catalogs.SucursalRepository;
+import com.example.tazuyuti_back.repositories.modules.BoletoRepository;
 import com.example.tazuyuti_back.repositories.modules.UnidadRepository;
 import com.example.tazuyuti_back.services.administration.UserService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -57,6 +58,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UnidadRepository unidadRepository;
+
+    @Autowired
+    private BoletoRepository boletoRepository;
 
     @Override
     public ResponseEntity<Response> save(User usuario, HttpServletRequest request) {
@@ -159,6 +163,51 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<Response> detailTransferencias(
+            int id, String fechaInicioStr, String fechaFinStr) {
+        Optional<User> usuarioOp = usuarioRepo.findById(id);
+        if (usuarioOp.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "Usuario no encontrado", null));
+        }
+        User usuario = usuarioOp.get();
+        List<Unidad> unidadList = unidadRepository.findByUsuarioId(id);
+        if (unidadList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(false, "El chofer no cuenta con unidades asignadas", null));
+        }
+        Unidad unidad = unidadList.get(0);
+        LocalDate fechaInicio;
+        LocalDate fechaFin;
+        try {
+            fechaInicio = LocalDate.parse(fechaInicioStr);
+            fechaFin = LocalDate.parse(fechaFinStr);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new Response(false, "Formato de fecha inválido. Use yyyy-MM-dd", null));
+        }
+        if (fechaInicio.isAfter(fechaFin)) {
+            return ResponseEntity.badRequest()
+                    .body(new Response(false, "La fecha de inicio no puede ser mayor que la fecha final", null));
+        }
+        Timestamp inicio = Timestamp.valueOf(fechaInicio.atStartOfDay());
+        Timestamp fin = Timestamp.valueOf(fechaFin.atTime(23, 59, 59));
+        List<Boleto> boletos = boletoRepository
+                .findTransferenciasByUnidadAndFecha(unidad.getId(), inicio, fin);
+        double totalGeneral = boletos.stream()
+                .mapToDouble(Boleto::getTotal)
+                .sum();
+        Map<String, Object> data = new HashMap<>();
+        data.put("usuario", usuario);
+        data.put("unidad", unidad);
+        data.put("boletos", boletos);
+        data.put("totalGeneral", totalGeneral);
+        data.put("cantidad", boletos.size());
+        return ResponseEntity.ok(
+                new Response(true, "Registros encontrados", data));
+    }
+
+    @Override
     public ResponseEntity<Response> update(User usuario, HttpServletRequest request) {
         int counterMails = usuarioRepo.countByUsuarioIgnoringCaseAndActivoTrueAndIdNot(usuario.getUsuario(),
                 usuario.getId());
@@ -171,9 +220,10 @@ public class UserServiceImpl implements UserService {
             User userToUpdate = user.get();
             if (userToUpdate.getRol().getId() == 5 && usuario.getRol().getId() != 5) {
                 List<Unidad> unidadOp = unidadRepository.findByUsuarioId(userToUpdate.getId());
-                if(!unidadOp.isEmpty()){
-                       return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new Response(false, "No es posible modificar el rol del chofer, aun pertenece a una unidad", null));
+                if (!unidadOp.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body(new Response(false,
+                                    "No es posible modificar el rol del chofer, aun pertenece a una unidad", null));
                 }
             }
             Timestamp currentDate = ToolHelper.castDateTime(ToolHelper.getCurrentDateTime());
