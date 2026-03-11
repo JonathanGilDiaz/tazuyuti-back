@@ -41,7 +41,6 @@ import com.example.tazuyuti_back.repositories.modules.DetalleRutasViajePaqueteRe
 import com.example.tazuyuti_back.repositories.modules.EntregarPaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.EnviarPaqueteRepository;
 import com.example.tazuyuti_back.repositories.modules.PaqueteRepository;
-import com.example.tazuyuti_back.repositories.modules.PrecioPaqueteriaRepository;
 import com.example.tazuyuti_back.repositories.modules.RecibirPaqueteRepository;
 import com.example.tazuyuti_back.services.modules.PaqueteService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,9 +54,6 @@ public class PaqueteServiceImpl implements PaqueteService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PrecioPaqueteriaRepository precioPRepository;
 
     @Autowired
     private SucursalRepository sucursalRepository;
@@ -137,7 +133,6 @@ public class PaqueteServiceImpl implements PaqueteService {
     @Override
     public ResponseEntity<Response> catalogs() {
         Map<String, Object> response = new HashMap<>();
-        response.put("precios", precioPRepository.findByEstadoTrue());
         response.put("sucursal", sucursalRepository.findAll());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response(true, SystemText.General.PROCESO_EXITOSO, response));

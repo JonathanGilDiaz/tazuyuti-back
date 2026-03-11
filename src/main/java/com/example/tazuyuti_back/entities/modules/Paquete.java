@@ -49,20 +49,20 @@ import lombok.ToString;
 public class Paquete {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // This annotation indicates that the primary key value is
-    @Schema(description = SystemText.User.ENTITY_ID, example = "10") // This annotation indicates that information for
-    @NotNull(groups = onUpdate.class, message = SystemText.User.ENTITY_USUARIO_ID_REQUERIDO) // This annotation
-    @Column(name = "id") // This annotation indicates that Associates the attribute with a database
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = SystemText.User.ENTITY_ID, example = "10")
+    @NotNull(groups = onUpdate.class, message = SystemText.User.ENTITY_USUARIO_ID_REQUERIDO)
+    @Column(name = "id")
     private int id;
 
-    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "destinatario es requerido") // This annotation
-    @Schema(description = "destinatario", example = "Jonathan") // This annotation indicates that information for the
-    @Column(name = "destinatario", nullable = false) // This annotation indicates that Associates the attribute with a
+    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "destinatario es requerido")
+    @Schema(description = "destinatario", example = "Jonathan")
+    @Column(name = "destinatario", nullable = false)
     private String destinatario;
 
-    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "remitente es requerido") // This annotation
-    @Schema(description = "remitente", example = "Jonathan") // This annotation indicates that information for the
-    @Column(name = "remitente", nullable = false) // This annotation indicates that Associates the attribute with a
+    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "remitente es requerido")
+    @Schema(description = "remitente", example = "Jonathan")
+    @Column(name = "remitente", nullable = false)
     private String remitente;
 
     @CreationTimestamp
@@ -72,62 +72,60 @@ public class Paquete {
     private Timestamp fechaCreacion;
 
     @ManyToOne
-    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }") // This annotation indicates that
-    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "El Usuario es requerido") // This annotation
-    @JoinColumn(name = "usuario_id", referencedColumnName = "id") // This annotation indicates that Relate the table to
+    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }")
+    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "El Usuario es requerido")
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private User usuario;
 
-    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "La forma de pago es requerido") // This annotation
-    @Schema(description = "Nombre de la camioenta", example = "01 Efectivo") // This annotation indicates that
-    @Column(name = "forma_pago", nullable = false) // This annotation indicates that Associates the attribute with a
+    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "La forma de pago es requerido")
+    @Schema(description = "Nombre de la camioenta", example = "01 Efectivo")
+    @Column(name = "forma_pago", nullable = false)
     private String formaPago;
 
-    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "Total de la venta es requerido") // This annotation
-    @Schema(description = "Total de la venta", example = "10.50") // This annotation indicates that information for the
-    @Column(name = "total", nullable = false) // This annotation indicates that Associates the attribute with a database
+    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "Total de la venta es requerido")
+    @Schema(description = "Total de la venta", example = "10.50")
+    @Column(name = "total", nullable = false)
     private double total;
 
-    @Schema(description = "Folio de la venta", example = "D58") // This annotation indicates that information for the
-    @Column(name = "folio", nullable = true) // This annotation indicates that Associates the attribute with a database
-     private String folio;
+    @Schema(description = "Folio de la venta", example = "D58")
+    @Column(name = "folio", nullable = true)
+    private String folio;
 
-    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }") // This annotation indicates that
-    @OneToOne // This annotation indicates that it has a one-to-one relationship with the
-    @JoinColumn(name = "estado_id", referencedColumnName = "id") // This annotation indicates that Relate the table to
+    @Schema(description = SystemText.User.ENTITY_ROL, example = "{ \"id\": 1 }")
+    @OneToOne
+    @JoinColumn(name = "estado_id", referencedColumnName = "id")
     private EstadoPaquete estado;
 
-    @Schema(description = SystemText.User.ENTITY_SUCURSAL_ID, example = "{ \"id\": 1 }") // This annotation indicates
-    @NotNull(groups = { onCreate.class, onUpdate.class }, message = SystemText.User.ENTITY_SUCURSAL_ID_REQUERIDO) // This                                                                               // null.
-    @ManyToOne // This annotation indicates that it has a one-to-one relationship with the
-    @JoinColumn(name = "destino_id", referencedColumnName = "id") // This annotation indicates that Relate the table to
+    @Schema(description = SystemText.User.ENTITY_SUCURSAL_ID, example = "{ \"id\": 1 }")
+    @NotNull(groups = { onCreate.class, onUpdate.class }, message = SystemText.User.ENTITY_SUCURSAL_ID_REQUERIDO) // null.
+    @ManyToOne
+    @JoinColumn(name = "destino_id", referencedColumnName = "id")
     private Sucursal destino;
 
-    @Column(name = "pago", nullable = true) // This annotation indicates that Associates the attribute with a database
+    @Column(name = "pago", nullable = true)
     private double pago;
 
-    @Column(name = "cambio", nullable = true) // This annotation indicates that Associates the attribute with a database
+    @Column(name = "cambio", nullable = true)
     private double cambio;
 
     @Valid
-    @Builder.Default // This annotation indicates that the attribute has a default value
+    @Builder.Default
     @JsonManagedReference
-    @Schema(description = "Arreglo de los detalles de la venta") // This annotation indicates that information for the
-                                                                 // swagger // This annotation indicates that
-                                                                 // information for the swagger
+    @Schema(description = "Arreglo de los detalles de la venta")
     @OneToMany(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePaquete> detallePaquete = null;
 
-   @JsonIdentityReference(alwaysAsId = false)
+    @JsonIdentityReference(alwaysAsId = false)
     @OneToOne(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private CancelarPaquete cancelacion;
 
-     @JsonIdentityReference(alwaysAsId = false)
+    @JsonIdentityReference(alwaysAsId = false)
     @OneToOne(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private EnviarPaquete envio;
 
     @JsonIdentityReference(alwaysAsId = false)
     @OneToOne(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-   private RecibirPaquete recibo;
+    private RecibirPaquete recibo;
 
     @JsonIdentityReference(alwaysAsId = false)
     @OneToOne(mappedBy = "paquete", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

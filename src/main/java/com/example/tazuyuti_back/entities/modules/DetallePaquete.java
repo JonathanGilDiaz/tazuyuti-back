@@ -42,15 +42,13 @@ public class DetallePaquete {
     private int id;
 
     @JsonBackReference
-    @ManyToOne(optional = false) 
+    @ManyToOne(optional = false)
     @JoinColumn(name = "paquete_id", referencedColumnName = "id", nullable = false)
     @NotNull(groups = { onCreate.class, onUpdate.class }, message = "La venta es requerida")
     private Paquete paquete;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "precio_id", referencedColumnName = "id", nullable = false)
-    @NotNull(groups = { onCreate.class, onUpdate.class }, message = "El producto es requerido")
-    private PrecioPaqueteria precioPaquete;
+    @Column(name = "concepto", nullable = true)
+    private String concepto;
 
     @Column(name = "cantidad", nullable = true)
     private double cantidad;

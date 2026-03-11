@@ -281,7 +281,7 @@ public class DocumentHelper {
             StringBuilder conceptos = new StringBuilder();
             if (paquete.getDetallePaquete() != null) {
                 for (DetallePaquete det : paquete.getDetallePaquete()) {
-                    String desc = det.getPrecioPaquete() != null ? det.getPrecioPaquete().getNombre() : "Concepto";
+                    String desc = det.getConcepto() != null ? det.getConcepto() : "Concepto";
                     Double precio = det.getPrecio();
                     Double subtotal = det.getSubtotal();
                     Double cantidad = det.getCantidad();
@@ -455,7 +455,7 @@ public class DocumentHelper {
                             + "</td></tr>"
 
                             + "<tr><td style='border:1px solid #000; padding:5px;'>Concepto:</td>"
-                            + "<td style='border:1px solid #000; padding:5px;'>" + det.getPrecioPaquete().getNombre()
+                            + "<td style='border:1px solid #000; padding:5px;'>" + det.getConcepto()
                             + "</td></tr>"
 
                             + "<tr><td style='border:1px solid #000; padding:5px;'>Costo envío:</td>"
